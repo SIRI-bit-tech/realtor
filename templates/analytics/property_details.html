@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ property.title }} Analytics | Realtor{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="analytics-dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">{{ property.title }} Analytics</h1>
+            <div class="dashboard-controls">
+                <form method="get" class="date-range-form">
+                    <input type="hidden" name="property_id" value="{{ property.id }}">
+                    <label for="days">Time Period:</label>
+                    <select name="days" id="days" onchange="this.form.submit()">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                        <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                        <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+                    </select>
+                </form>
+                <div class="dashboard-actions">
+                    <a href="{% url 'analytics:properties' %}" class="btn btn-outline">Back to Properties</a>
+                    <a href="{% url 'properties:detail' property.slug %}" class="btn btn-primary">View Property</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="property-info-card">
+            <div class="property-info-header">
+                <div class="property-image">
+                    {% if property.images.first %}
+                        <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}">
+                    {% else %}
+                        <div class="placeholder-image">No Image</div>
+                    {% endif %}
+                </div>
+                <div class="property-details">
+                    <h2>{{ property.title }}</h2>
+                    <p class="property-location">{{ property.location.name }}</p>
+                    <p class="property-price">${{ property.price|floatformat:0 }}</p>
+                    <div class="property-meta">
+                        <span>{{ property.bedrooms }} beds</span>
+                        <span>{{ property.bathrooms }} baths</span>
+                        <span>{{ property.area }} sq ft</span>
+                        <span>{{ property.property_type.name }}</span>
+                    </div>
+                    <p class="property-status {{ property.status }}">{{ property.status|title }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="icon-eye"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value">{{ view_count }}</h3>
+                    <p class="stat-label">Total Views</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="icon-heart"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value">{{ property.favorited_by.count }}</h3>
+                    <p class="stat-label">Favorites</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="icon-message"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value">{{ property.inquiries.count }}</h3>
+                    <p class="stat-label">Inquiries</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h2 class="card-title">Views Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="propertyViewsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h2 class="card-title">User Activities</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                            <tr>
+                                <td>{{ activity.action|title }}</td>
+                                <td>{{ activity.count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No activities recorded</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/analytics.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Property views chart
+        const viewsData = {{ daily_views|safe }};
+        const labels = viewsData.map(item => new Date(item.day).toLocaleDateString());
+        const values = viewsData.map(item => item.count);
+        
+        const ctx = document.getElementById('propertyViewsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Property Views',
+                    data: values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

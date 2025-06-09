@@ -1,0 +1,55 @@
+{% load static %}
+
+<div class="search-suggestions-container">
+    {% if suggestions.properties %}
+        <div class="suggestion-group">
+            <h4 class="suggestion-title">Properties</h4>
+            {% for property in suggestions.properties %}
+                <a href="/properties/{{ property.slug }}/" class="suggestion-item">
+                    <i class="icon-home"></i>
+                    <div class="suggestion-content">
+                        <div class="suggestion-name">{{ property.title }}</div>
+                        <div class="suggestion-meta">{{ property.address }}</div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if suggestions.locations %}
+        <div class="suggestion-group">
+            <h4 class="suggestion-title">Locations</h4>
+            {% for location in suggestions.locations %}
+                <a href="/properties/?location={{ location.slug }}" class="suggestion-item">
+                    <i class="icon-location"></i>
+                    <div class="suggestion-content">
+                        <div class="suggestion-name">{{ location.name }}</div>
+                        <div class="suggestion-meta">{{ location.state }}</div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if suggestions.agents %}
+        <div class="suggestion-group">
+            <h4 class="suggestion-title">Agents</h4>
+            {% for agent in suggestions.agents %}
+                <a href="/agents/{{ agent.user__username }}/" class="suggestion-item">
+                    <i class="icon-user"></i>
+                    <div class="suggestion-content">
+                        <div class="suggestion-name">{{ agent.user__first_name }} {{ agent.user__last_name }}</div>
+                        <div class="suggestion-meta">Real Estate Agent</div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if not suggestions.properties and not suggestions.locations and not suggestions.agents %}
+        <div class="no-suggestions">
+            <i class="icon-search"></i>
+            <p>No suggestions found for "{{ query }}"</p>
+        </div>
+    {% endif %}
+</div>

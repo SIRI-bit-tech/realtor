@@ -1,0 +1,6 @@
+<button class="action-btn favorite-btn {% if is_favorited %}favorited{% endif %}" 
+        hx-post="{% url 'properties:toggle_favorite' property.id %}"
+        hx-target="this"
+        hx-swap="outerHTML">
+    <i class="{% if is_favorited %}icon-heart-filled{% else %}icon-heart{% endif %}"></i>
+</button>

@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Realtor - Find Your Dream Home{% endblock %}
+
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Parallax -->
+<section class="hero-section" id="hero">
+    <div class="hero-background">
+        <div class="hero-video-container">
+            <video autoplay muted loop class="hero-video">
+                <source src="{% static 'videos/hero-video.mp4' %}" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+        </div>
+    </div>
+    
+    <div class="hero-content">
+        <div class="container">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="hero-title-line">Find Your</span>
+                    <span class="hero-title-line accent">Dream Home</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Discover luxury properties with our premium real estate services. 
+                    Connect with top agents and find your perfect property today.
+                </p>
+                
+                <!-- Hero Search Form -->
+                <div class="hero-search">
+                    <form class="search-form" hx-get="{% url 'search:results' %}" hx-target="#search-results" hx-indicator="#search-loading">
+                        <div class="search-inputs">
+                            <div class="search-input-group">
+                                <select name="listing_type" class="search-select">
+                                    <option value="">Buy or Rent</option>
+                                    <option value="sale">Buy</option>
+                                    <option value="rent">Rent</option>
+                                    <option value="lease">Lease</option>
+                                </select>
+                            </div>
+                            
+                            <div class="search-input-group">
+                                <input type="text" name="location" placeholder="Enter location..." class="search-input" 
+                                       hx-get="{% url 'core:search_suggestions' %}" 
+                                       hx-trigger="keyup changed delay:300ms" 
+                                       hx-target="#location-suggestions">
+                                <div id="location-suggestions" class="search-suggestions"></div>
+                            </div>
+                            
+                            <div class="search-input-group">
+                                <select name="property_type" class="search-select">
+                                    <option value="">Property Type</option>
+                                    {% for type in property_types %}
+                                        <option value="{{ type.slug }}">{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="search-input-group">
+                                <select name="bedrooms" class="search-select">
+                                    <option value="">Bedrooms</option>
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="4">4+</option>
+                                    <option value="5">5+</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-cta search-btn">
+                                <i class="icon-search"></i>
+                                Search Properties
+                            </button>
+                        </div>
+                        
+                        <div id="search-loading" class="search-loading htmx-indicator">
+                            <div class="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-arrow"></div>
+        <span>Scroll to explore</span>
+    </div>
+</section>
+
+<!-- Statistics Section with Counter Animation -->
+<section class="stats-section" id="stats">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-icon">
+                    <i class="icon-home"></i>
+                </div>
+                <div class="stat-number" data-count="{{ stats.total_properties }}">0</div>
+                <div class="stat-label">Properties Available</div>
+            </div>
+            
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-icon">
+                    <i class="icon-users"></i>
+                </div>
+                <div class="stat-number" data-count="{{ stats.total_agents }}">0</div>
+                <div class="stat-label">Expert Agents</div>
+            </div>
+            
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-icon">
+                    <i class="icon-check"></i>
+                </div>
+                <div class="stat-number" data-count="{{ stats.total_sales }}">0</div>
+                <div class="stat-label">Successful Sales</div>
+            </div>
+            
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="400">
+                <div class="stat-icon">
+                    <i class="icon-map"></i>
+                </div>
+                <div class="stat-number" data-count="{{ stats.total_locations }}">0</div>
+                <div class="stat-label">Cities Covered</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties Section -->
+<section class="featured-properties" id="featured-properties">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Properties</h2>
+            <p class="section-subtitle">Discover our handpicked selection of premium properties</p>
+        </div>
+        
+        <div class="properties-grid">
+            {% for property in featured_properties %}
+                <div class="property-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                    <div class="property-image">
+                        {% if property.images.first %}
+                            <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ property.title }}" loading="lazy">
+                        {% endif %}
+                        
+                        <div class="property-overlay">
+                            <div class="property-actions">
+                                <button class="action-btn favorite-btn" 
+                                        hx-post="{% url 'properties:toggle_favorite' property.id %}"
+                                        hx-target="this"
+                                        hx-swap="outerHTML">
+                                    <i class="icon-heart"></i>
+                                </button>
+                                <a href="{{ property.get_absolute_url }}" class="action-btn view-btn">
+                                    <i class="icon-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="property-badges">
+                            <span class="badge badge-{{ property.listing_type }}">
+                                For {{ property.get_listing_type_display }}
+                            </span>
+                            {% if property.status == 'pending' %}
+                                <span class="badge badge-pending">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="property-content">
+                        <div class="property-price">
+                            ${{ property.price|floatformat:0 }}
+                            {% if property.listing_type == 'rent' %}/month{% endif %}
+                        </div>
+                        
+                        <h3 class="property-title">
+                            <a href="{{ property.get_absolute_url }}">{{ property.title }}</a>
+                        </h3>
+                        
+                        <div class="property-location">
+                            <i class="icon-location"></i>
+                            {{ property.address }}, {{ property.location.name }}
+                        </div>
+                        
+                        <div class="property-features">
+                            <span class="feature">
+                                <i class="icon-bed"></i>
+                                {{ property.bedrooms }} bed{{ property.bedrooms|pluralize }}
+                            </span>
+                            <span class="feature">
+                                <i class="icon-bath"></i>
+                                {{ property.bathrooms }} bath{{ property.bathrooms|pluralize }}
+                            </span>
+                            <span class="feature">
+                                <i class="icon-area"></i>
+                                {{ property.square_feet|floatformat:0 }} sq ft
+                            </span>
+                        </div>
+                        
+                        <div class="property-agent">
+                            <div class="agent-avatar">
+                                {% if property.agent.avatar %}
+                                    <img src="{{ property.agent.avatar.url }}" alt="{{ property.agent.get_full_name }}">
+                                {% else %}
+                                    <div class="avatar-placeholder">{{ property.agent.first_name|first }}{{ property.agent.last_name|first }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="agent-info">
+                                <div class="agent-name">{{ property.agent.get_full_name }}</div>
+                                <div class="agent-title">Real Estate Agent</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="section-footer">
+            <a href="{% url 'properties:list' %}" class="btn btn-outline">View All Properties</a>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section" id="services">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Our Services</h2>
+            <p class="section-subtitle">Comprehensive real estate solutions for all your needs</p>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-icon">
+                    <i class="icon-home-search"></i>
+                </div>
+                <h3 class="service-title">Property Search</h3>
+                <p class="service-description">
+                    Find your perfect property with our advanced search tools and personalized recommendations.
+                </p>
+                <ul class="service-features">
+                    <li>Advanced filtering options</li>
+                    <li>Saved searches & alerts</li>
+                    <li>Virtual property tours</li>
+                    <li>Market analysis reports</li>
+                </ul>
+            </div>
+            
+            <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-icon">
+                    <i class="icon-handshake"></i>
+                </div>
+                <h3 class="service-title">Buying Assistance</h3>
+                <p class="service-description">
+                    Expert guidance throughout the entire buying process from search to closing.
+                </p>
+                <ul class="service-features">
+                    <li>Buyer representation</li>
+                    <li>Negotiation expertise</li>
+                    <li>Financing assistance</li>
+                    <li>Closing coordination</li>
+                </ul>
+            </div>
+            
+            <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-icon">
+                    <i class="icon-tag"></i>
+                </div>
+                <h3 class="service-title">Selling Services</h3>
+                <p class="service-description">
+                    Maximize your property's value with our comprehensive selling and marketing services.
+                </p>
+                <ul class="service-features">
+                    <li>Property valuation</li>
+                    <li>Professional photography</li>
+                    <li>Marketing campaigns</li>
+                    <li>Staging consultation</li>
+                </ul>
+            </div>
+            
+            <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="service-icon">
+                    <i class="icon-calculator"></i>
+                </div>
+                <h3 class="service-title">Investment Analysis</h3>
+                <p class="service-description">
+                    Make informed investment decisions with our detailed market analysis and ROI calculations.
+                </p>
+                <ul class="service-features">
+                    <li>Market trend analysis</li>
+                    <li>ROI calculations</li>
+                    <li>Investment strategies</li>
+                    <li>Portfolio management</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Agents Section -->
+<section class="featured-agents" id="featured-agents">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Meet Our Top Agents</h2>
+            <p class="section-subtitle">Work with experienced professionals who know the market inside out</p>
+        </div>
+        
+        <div class="agents-grid">
+            {% for agent in featured_agents %}
+                <div class="agent-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:100 }}">
+                    <div class="agent-image">
+                        {% if agent.user.avatar %}
+                            <img src="{{ agent.user.avatar.url }}" alt="{{ agent.user.get_full_name }}">
+                        {% else %}
+                            <div class="agent-placeholder">{{ agent.user.first_name|first }}{{ agent.user.last_name|first }}</div>
+                        {% endif %}
+                        
+                        <div class="agent-overlay">
+                            <div class="agent-social">
+                                <a href="mailto:{{ agent.user.email }}" class="social-btn">
+                                    <i class="icon-email"></i>
+                                </a>
+                                <a href="tel:{{ agent.mobile_phone }}" class="social-btn">
+                                    <i class="icon-phone"></i>
+                                </a>
+                                {% if agent.user.website %}
+                                    <a href="{{ agent.user.website }}" class="social-btn" target="_blank">
+                                        <i class="icon-globe"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="agent-content">
+                        <h3 class="agent-name">{{ agent.user.get_full_name }}</h3>
+                        <div class="agent-title">{{ agent.agency.name }}</div>
+                        <div class="agent-experience">{{ agent.years_experience }} years experience</div>
+                        
+                        <div class="agent-stats">
+                            <div class="stat">
+                                <span class="stat-number">{{ agent.total_sales }}</span>
+                                <span class="stat-label">Sales</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">${{ agent.total_volume|floatformat:0 }}M</span>
+                                <span class="stat-label">Volume</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number">{{ agent.average_rating|floatformat:1 }}</span>
+                                <span class="stat-label">Rating</span>
+                            </div>
+                        </div>
+                        
+                        <div class="agent-specializations">
+                            {% for spec in agent.specializations|slice:":3" %}
+                                <span class="specialization-tag">{{ spec }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <a href="{{ agent.get_absolute_url }}" class="btn btn-outline btn-sm">View Profile</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="section-footer">
+            <a href="{% url 'agents:list' %}" class="btn btn-primary">View All Agents</a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section" id="cta">
+    <div class="cta-background">
+        <div class="cta-overlay"></div>
+    </div>
+    
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Find Your Dream Home?</h2>
+            <p class="cta-subtitle">
+                Join thousands of satisfied clients who found their perfect property with our help. 
+                Start your journey today and let our experts guide you every step of the way.
+            </p>
+            
+            <div class="cta-actions">
+                <a href="{% url 'properties:list' %}" class="btn btn-cta btn-lg">Browse Properties</a>
+                <a href="{% url 'core:contact' %}" class="btn btn-outline btn-lg">Contact Us</a>
+            </div>
+            
+            <div class="cta-features">
+                <div class="cta-feature">
+                    <i class="icon-shield"></i>
+                    <span>Trusted & Secure</span>
+                </div>
+                <div class="cta-feature">
+                    <i class="icon-support"></i>
+                    <span>24/7 Support</span>
+                </div>
+                <div class="cta-feature">
+                    <i class="icon-award"></i>
+                    <span>Award Winning</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/home.js' %}"></script>
+<script src="{% static 'js/counter-animation.js' %}"></script>
+<script src="{% static 'js/parallax.js' %}"></script>
+{% endblock %}

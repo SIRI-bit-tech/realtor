@@ -1,0 +1,16 @@
+<div class="alert alert-success" role="alert">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-check-circle me-2"></i>
+        <div>
+            <h5 class="alert-heading mb-1">Welcome back!</h5>
+            <p class="mb-0">Login successful. Redirecting...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto redirect after 1 second
+    setTimeout(function() {
+        window.location.href = "{{ redirect_url }}";
+    }, 1000);
+</script>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Realtor - Premium Real Estate{% endblock %}</title>
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Find your dream home with our premium real estate services. Browse luxury properties, connect with top agents, and discover your perfect property.{% endblock %}">
+    <meta name="keywords" content="real estate, properties, homes, luxury, agents, buy, sell, rent">
+    <meta name="author" content="Realtor">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}Realtor - Premium Real Estate{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Find your dream home with our premium real estate services.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% load static %}{% static 'images/og-image.jpg' %}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    
+    <!-- CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    
+    <!-- Global CSS Files -->
+    <link rel="stylesheet" href="{% static 'css/properties.css' %}">
+    <link rel="stylesheet" href="{% static 'css/agents.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+    <link rel="stylesheet" href="{% static 'css/about.css' %}">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="{% url 'core:home' %}" class="brand-link">
+                    <img src="{% static 'images/logo.svg' %}" alt="Realtor" class="brand-logo">
+                    <span class="brand-text">Realtor</span>
+                </a>
+            </div>
+            
+            <div class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{% url 'core:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'properties:list' %}" class="nav-link {% if 'properties' in request.resolver_match.namespace %}active{% endif %}">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'agents:list' %}" class="nav-link {% if 'agents' in request.resolver_match.namespace %}active{% endif %}">Agents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'core:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'core:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'analytics:dashboard' %}" class="nav-link {% if 'analytics' in request.resolver_match.namespace %}active{% endif %}">Analytics</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-actions">
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <button class="user-menu-toggle" id="user-menu-toggle">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="user-avatar">
+                            {% else %}
+                                <div class="user-avatar-placeholder">{{ user.username|first|upper }}</div>
+                            {% endif %}
+                            <span>{{ user.get_full_name|default:user.username }}</span>
+                        </button>
+                        <div class="user-dropdown" id="user-dropdown">
+                            <a href="{% url 'users:profile' user.username %}" class="dropdown-item">Profile</a>
+                            <a href="{% url 'users:favorites' %}" class="dropdown-item">Favorites</a>
+                            <a href="{% url 'users:dashboard' %}" class="dropdown-item">Dashboard</a>
+                            <hr class="dropdown-divider">
+                            <a href="{% url 'accounts:logout' %}" class="dropdown-item">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline">Login</a>
+                    <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Sign Up</a>
+                {% endif %}
+            </div>
+            
+            <button class="nav-toggle" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <img src="{% static 'images/logo-white.svg' %}" alt="Realtor" class="footer-logo">
+                        <p class="footer-description">
+                            Your trusted partner in finding the perfect property. 
+                            We connect buyers, sellers, and renters with experienced agents.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'properties:list' %}">Properties</a></li>
+                        <li><a href="{% url 'agents:list' %}">Agents</a></li>
+                        <li><a href="{% url 'core:about' %}">About Us</a></li>
+                        <li><a href="{% url 'core:contact' %}">Contact</a></li>
+                        <li><a href="{% url 'analytics:dashboard' %}">Analytics</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 class="footer-title">Property Types</h3>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'properties:list' %}?type=house">Houses</a></li>
+                        <li><a href="{% url 'properties:list' %}?type=apartment">Apartments</a></li>
+                        <li><a href="{% url 'properties:list' %}?type=condo">Condos</a></li>
+                        <li><a href="{% url 'properties:list' %}?type=commercial">Commercial</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 class="footer-title">Contact Info</h3>
+                    <div class="contact-info">
+                        <p><i class="icon-phone"></i> (555) 123-4567</p>
+                        <p><i class="icon-email"></i> info@realtor.com</p>
+                        <p><i class="icon-location"></i> 123 Real Estate Ave, City, State 12345</p>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="icon-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="icon-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="icon-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="icon-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2024 Realtor. All rights reserved.</p>
+                    <div class="footer-bottom-links">
+                        <a href="/privacy/">Privacy Policy</a>
+                        <a href="/terms/">Terms of Service</a>
+                        <a href="/sitemap.xml">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/htmx-config.js' %}"></script>
+    <script src="{% static 'js/animations.js' %}"></script>
+    <script src="{% static 'js/counter-animation.js' %}"></script>
+    <script src="{% static 'js/parallax.js' %}"></script>
+    <script src="{% static 'js/properties.js' %}"></script>
+    <script src="{% static 'js/contact.js' %}"></script>
+    <script src="{% static 'js/about.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/analytics.js' %}"></script>
+    
+    <!-- Additional JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Properties for Sale & Rent - Realtor{% endblock %}
+
+{% block content %}
+<div class="properties-page">
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="page-header-content">
+                <h1 class="page-title">Properties</h1>
+                <p class="page-subtitle">Find your perfect home from our extensive collection</p>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat">
+                        <span class="stat-number">{{ page_obj.paginator.count }}</span>
+                        <span class="stat-label">Properties Available</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+        <div class="container">
+            <form id="property-filters" hx-get="{% url 'properties:list' %}" hx-target="#properties-container" hx-indicator="#filter-loading">
+                <div class="filters-grid">
+                    <!-- Search -->
+                    <div class="filter-group">
+                        <label for="search">Search</label>
+                        {{ filter.form.search }}
+                    </div>
+                    
+                    <!-- Listing Type -->
+                    <div class="filter-group">
+                        <label for="listing_type">Type</label>
+                        {{ filter.form.listing_type }}
+                    </div>
+                    
+                    <!-- Property Type -->
+                    <div class="filter-group">
+                        <label for="property_type">Property Type</label>
+                        {{ filter.form.property_type }}
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="filter-group">
+                        <label for="location">Location</label>
+                        {{ filter.form.location }}
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="filter-group price-range-group">
+                        <label>Price Range</label>
+                        <div class="price-inputs">
+                            {{ filter.form.price_min }}
+                            <span class="price-separator">to</span>
+                            {{ filter.form.price_max }}
+                        </div>
+                        <div id="price-range" class="price-range-slider" 
+                             data-min="{{ price_range.min_price|default:0 }}" 
+                             data-max="{{ price_range.max_price|default:1000000 }}">
+                            <div class="price-display"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bedrooms -->
+                    <div class="filter-group">
+                        <label for="bedrooms">Bedrooms</label>
+                        {{ filter.form.bedrooms }}
+                    </div>
+                    
+                    <!-- Bathrooms -->
+                    <div class="filter-group">
+                        <label for="bathrooms">Bathrooms</label>
+                        {{ filter.form.bathrooms }}
+                    </div>
+                    
+                    <!-- Sort -->
+                    <div class="filter-group">
+                        <label for="sort_by">Sort By</label>
+                        {{ filter.form.sort_by }}
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="button" id="clear-filters" class="btn btn-outline">Clear Filters</button>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                </div>
+                
+                <div id="filter-loading" class="filter-loading htmx-indicator">
+                    <div class="loading-spinner"></div>
+                    <span>Filtering properties...</span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Properties Container -->
+    <section class="properties-container" id="properties-container">
+        <div class="container">
+            <!-- View Toggle -->
+            <div class="view-controls">
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid">
+                        <i class="icon-grid"></i> Grid
+                    </button>
+                    <button class="view-btn" data-view="list">
+                        <i class="icon-list"></i> List
+                    </button>
+                    <button class="view-btn" data-view="map">
+                        <i class="icon-map"></i> Map
+                    </button>
+                </div>
+                
+                <div class="results-info">
+                    <span>{{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} properties</span>
+                </div>
+            </div>
+
+            <!-- Properties Grid -->
+            <div class="properties-grid" id="properties-grid">
+                {% include 'partials/property_list.html' %}
+            </div>
+
+            <!-- Map View -->
+            <div class="map-container" id="map-container" style="display: none;">
+                <div id="property-map" style="height: 600px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Property Comparison Panel -->
+    <div id="compare-panel" class="compare-panel"></div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/properties.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="{% static 'js/properties.js' %}"></script>
+{% endblock %}

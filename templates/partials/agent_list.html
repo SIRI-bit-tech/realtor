@@ -1,0 +1,121 @@
+{% load static %}
+
+<div class="agents-grid">
+    {% for agent in page_obj %}
+        <div class="agent-card">
+            <div class="agent-image">
+                {% if agent.user.avatar %}
+                    <img src="{{ agent.user.avatar.url }}" alt="{{ agent.user.get_full_name }}">
+                {% else %}
+                    <div class="agent-placeholder">{{ agent.user.first_name|first }}{{ agent.user.last_name|first }}</div>
+                {% endif %}
+                
+                <div class="agent-overlay">
+                    <div class="agent-social">
+                        <a href="mailto:{{ agent.user.email }}" class="social-btn">
+                            <i class="icon-email"></i>
+                        </a>
+                        <a href="tel:{{ agent.mobile_phone|default:agent.office_phone }}" class="social-btn">
+                            <i class="icon-phone"></i>
+                        </a>
+                        {% if agent.user.website %}
+                            <a href="{{ agent.user.website }}" class="social-btn" target="_blank">
+                                <i class="icon-globe"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if agent.is_featured %}
+                    <div class="featured-badge">Featured</div>
+                {% endif %}
+            </div>
+            
+            <div class="agent-content">
+                <h3 class="agent-name">{{ agent.user.get_full_name }}</h3>
+                <div class="agent-title">{{ agent.agency.name }}</div>
+                <div class="agent-experience">{{ agent.years_experience }} years experience</div>
+                
+                <div class="agent-rating">
+                    <div class="stars">
+                        {% for i in "12345" %}
+                            <i class="icon-star {% if agent.avg_rating >= forloop.counter %}filled{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <span class="rating-text">{{ agent.avg_rating|floatformat:1 }} ({{ agent.review_count }} reviews)</span>
+                </div>
+                
+                <div class="agent-stats">
+                    <div class="stat">
+                        <span class="stat-number">{{ agent.total_sales }}</span>
+                        <span class="stat-label">Sales</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">${{ agent.total_volume|floatformat:0 }}M</span>
+                        <span class="stat-label">Volume</span>
+                    </div>
+                </div>
+                
+                <div class="agent-specializations">
+                    {% for spec in agent.specializations|slice:":3" %}
+                        <span class="specialization-tag">{{ spec }}</span>
+                    {% endfor %}
+                </div>
+                
+                <div class="agent-languages">
+                    {% if agent.languages %}
+                        <strong>Languages:</strong> {{ agent.languages|join:", " }}
+                    {% endif %}
+                </div>
+                
+                <div class="agent-actions">
+                    <a href="{{ agent.get_absolute_url }}" class="btn btn-primary">View Profile</a>
+                    <button class="btn btn-outline contact-agent-btn" data-agent-id="{{ agent.id }}">
+                        Contact
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="no-agents">
+            <div class="no-agents-icon">
+                <i class="icon-users"></i>
+            </div>
+            <h3>No Agents Found</h3>
+            <p>Try adjusting your search criteria.</p>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-left"></i><i class="icon-chevron-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-link current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-right"></i><i class="icon-chevron-right"></i>
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+{% endif %}

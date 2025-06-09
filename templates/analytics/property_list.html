@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Property Analytics | Realtor{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="analytics-dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Property Analytics</h1>
+            <div class="dashboard-controls">
+                <form method="get" class="date-range-form">
+                    <label for="days">Time Period:</label>
+                    <select name="days" id="days" onchange="this.form.submit()">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                        <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                        <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+                    </select>
+                </form>
+                <div class="dashboard-actions">
+                    <a href="{% url 'analytics:dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+                    <a href="{% url 'analytics:export' %}?type=property_views&days={{ days }}" class="btn btn-primary">Export Data</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analytics-card full-width">
+            <h2 class="card-title">Property Performance</h2>
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Views</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for property in properties %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'properties:detail' property.slug %}">
+                                    {{ property.title }}
+                                </a>
+                            </td>
+                            <td>{{ property.view_count }}</td>
+                            <td>{{ property.status|title }}</td>
+                            <td>${{ property.price|floatformat:0 }}</td>
+                            <td>{{ property.property_type.name }}</td>
+                            <td>{{ property.location.name }}</td>
+                            <td>
+                                <a href="{% url 'analytics:properties' %}?property_id={{ property.id }}&days={{ days }}" class="btn btn-sm">Details</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">No properties found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

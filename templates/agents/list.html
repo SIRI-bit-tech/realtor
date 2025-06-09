@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Real Estate Agents - Find Your Perfect Agent | Realtor{% endblock %}
+
+{% block content %}
+<div class="agents-page">
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <div class="page-header-content">
+                <h1 class="page-title">Our Agents</h1>
+                <p class="page-subtitle">Connect with experienced real estate professionals</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters-section">
+        <div class="container">
+            <form class="agent-filters" hx-get="{% url 'agents:list' %}" hx-target="#agents-container" hx-indicator="#filter-loading">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <input type="text" name="search" placeholder="Search agents..." value="{{ search_query }}" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <select name="agency" class="form-select">
+                            <option value="">All Agencies</option>
+                            {% for agency in agencies %}
+                                <option value="{{ agency.id }}" {% if agency.id|stringformat:"s" == current_agency %}selected{% endif %}>
+                                    {{ agency.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select name="specialization" class="form-select">
+                            <option value="">All Specializations</option>
+                            {% for spec in specializations %}
+                                <option value="{{ spec }}" {% if spec == current_specialization %}selected{% endif %}>
+                                    {{ spec }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select name="min_experience" class="form-select">
+                            <option value="">Any Experience</option>
+                            <option value="1">1+ years</option>
+                            <option value="5">5+ years</option>
+                            <option value="10">10+ years</option>
+                            <option value="15">15+ years</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select name="sort" class="form-select">
+                            <option value="featured" {% if current_sort == 'featured' %}selected{% endif %}>Featured</option>
+                            <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name</option>
+                            <option value="experience" {% if current_sort == 'experience' %}selected{% endif %}>Experience</option>
+                            <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Rating</option>
+                            <option value="sales" {% if current_sort == 'sales' %}selected{% endif %}>Sales</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="filter-loading" class="filter-loading htmx-indicator">
+                    <div class="loading-spinner"></div>
+                    <span>Loading agents...</span>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Agents Container -->
+    <section class="agents-container" id="agents-container">
+        <div class="container">
+            {% include 'partials/agent_list.html' %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/agents.css' %}">
+{% endblock %}

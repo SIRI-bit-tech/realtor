@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - {{ user.get_full_name|default:user.username }} | Realtor{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <!-- Dashboard Header -->
+    <section class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-header-content">
+                <div class="user-welcome">
+                    <h1>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+                    <p>Manage your properties, favorites, and account settings</p>
+                </div>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="icon-heart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number">{{ stats.favorites_count }}</span>
+                            <span class="stat-label">Favorites</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="icon-eye"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number">{{ stats.views_count }}</span>
+                            <span class="stat-label">Recent Views</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="icon-search"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-number">{{ stats.saved_searches_count }}</span>
+                            <span class="stat-label">Saved Searches</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Content -->
+    <section class="dashboard-content">
+        <div class="container">
+            <div class="dashboard-grid">
+                <!-- Main Content -->
+                <div class="dashboard-main">
+                    <!-- Favorite Properties -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2>Your Favorite Properties</h2>
+                            <a href="{% url 'users:favorites' %}" class="view-all-link">View All</a>
+                        </div>
+                        <div class="card-content">
+                            {% if favorites %}
+                                <div class="properties-grid">
+                                    {% for favorite in favorites %}
+                                        <div class="property-card-small">
+                                            <div class="property-image">
+                                                {% if favorite.property.images.first %}
+                                                    <img src="{{ favorite.property.images.first.image.url }}" alt="{{ favorite.property.title }}">
+                                                {% else %}
+                                                    <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ favorite.property.title }}">
+                                                {% endif %}
+                                            </div>
+                                            <div class="property-content">
+                                                <div class="property-price">${{ favorite.property.price|floatformat:0 }}</div>
+                                                <h4 class="property-title">
+                                                    <a href="{{ favorite.property.get_absolute_url }}">{{ favorite.property.title }}</a>
+                                                </h4>
+                                                <div class="property-location">{{ favorite.property.location.name }}</div>
+                                                <div class="property-features">
+                                                    <span>{{ favorite.property.bedrooms }} bed</span>
+                                                    <span>{{ favorite.property.bathrooms }} bath</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="icon-heart"></i>
+                                    <h3>No Favorite Properties</h3>
+                                    <p>Start browsing properties and add them to your favorites</p>
+                                    <a href="{% url 'properties:list' %}" class="btn btn-primary">Browse Properties</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Views -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2>Recently Viewed</h2>
+                        </div>
+                        <div class="card-content">
+                            {% if recent_views %}
+                                <div class="recent-views-list">
+                                    {% for view in recent_views %}
+                                        <div class="recent-view-item">
+                                            <div class="view-image">
+                                                {% if view.property.images.first %}
+                                                    <img src="{{ view.property.images.first.image.url }}" alt="{{ view.property.title }}">
+                                                {% else %}
+                                                    <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ view.property.title }}">
+                                                {% endif %}
+                                            </div>
+                                            <div class="view-content">
+                                                <h4 class="view-title">
+                                                    <a href="{{ view.property.get_absolute_url }}">{{ view.property.title }}</a>
+                                                </h4>
+                                                <div class="view-price">${{ view.property.price|floatformat:0 }}</div>
+                                                <div class="view-location">{{ view.property.location.name }}</div>
+                                                <div class="view-date">Viewed {{ view.created_at|timesince }} ago</div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="icon-eye"></i>
+                                    <h3>No Recent Views</h3>
+                                    <p>Properties you view will appear here</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="dashboard-sidebar">
+                    <!-- Quick Actions -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="quick-actions">
+                                <a href="{% url 'properties:list' %}" class="action-btn">
+                                    <i class="icon-search"></i>
+                                    <span>Search Properties</span>
+                                </a>
+                                <a href="{% url 'users:favorites' %}" class="action-btn">
+                                    <i class="icon-heart"></i>
+                                    <span>View Favorites</span>
+                                </a>
+                                <a href="{% url 'users:saved_searches' %}" class="action-btn">
+                                    <i class="icon-bookmark"></i>
+                                    <span>Saved Searches</span>
+                                </a>
+                                <a href="{% url 'users:edit_profile' %}" class="action-btn">
+                                    <i class="icon-settings"></i>
+                                    <span>Edit Profile</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Summary -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Profile Summary</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="profile-summary">
+                                <div class="profile-avatar">
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}">
+                                    {% else %}
+                                        <div class="avatar-placeholder">{{ user.username|first|upper }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="profile-info">
+                                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                                    <p>{{ user.email }}</p>
+                                    {% if user.phone %}
+                                        <p>{{ user.phone }}</p>
+                                    {% endif %}
+                                    <div class="profile-status">
+                                        {% if user.is_verified %}
+                                            <span class="status-badge verified">Verified</span>
+                                        {% else %}
+                                            <span class="status-badge unverified">Unverified</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Settings -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Account Settings</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="settings-list">
+                                <a href="{% url 'users:edit_profile' %}" class="setting-item">
+                                    <i class="icon-user"></i>
+                                    <span>Edit Profile</span>
+                                    <i class="icon-chevron-right"></i>
+                                </a>
+                                <a href="{% url 'accounts:password_reset' %}" class="setting-item">
+                                    <i class="icon-lock"></i>
+                                    <span>Change Password</span>
+                                    <i class="icon-chevron-right"></i>
+                                </a>
+                                <a href="{% url 'users:edit_profile' %}" class="setting-item">
+                                    <i class="icon-email"></i>
+                                    <span>Email Settings</span>
+                                    <i class="icon-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}

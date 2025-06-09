@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Analytics | Realtor{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="analytics-dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Search Analytics</h1>
+            <div class="dashboard-controls">
+                <form method="get" class="date-range-form">
+                    <label for="days">Time Period:</label>
+                    <select name="days" id="days" onchange="this.form.submit()">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                        <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                        <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+                    </select>
+                </form>
+                <div class="dashboard-actions">
+                    <a href="{% url 'analytics:dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+                    <a href="{% url 'analytics:export' %}?type=searches&days={{ days }}" class="btn btn-primary">Export Data</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h2 class="card-title">Search Volume Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="searchVolumeChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h2 class="card-title">Most Popular Search Terms</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Search Term</th>
+                                <th>Count</th>
+                                <th>Avg Results</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for term in most_searched %}
+                            <tr>
+                                <td>{{ term.query }}</td>
+                                <td>{{ term.search_count }}</td>
+                                <td>{{ term.avg_results|floatformat:0 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h2 class="card-title">Zero Result Searches</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Search Term</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for term in zero_results %}
+                            <tr>
+                                <td>{{ term.query }}</td>
+                                <td>{{ term.search_count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/analytics.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search volume chart
+        const searchData = {{ daily_searches|safe }};
+        const labels = searchData.map(item => new Date(item.day).toLocaleDateString());
+        const values = searchData.map(item => item.count);
+        const avgResults = searchData.map(item => item.avg_results);
+        
+        const ctx = document.getElementById('searchVolumeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Search Volume',
+                        data: values,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Avg Results',
+                        data: avgResults,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Search Count'
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Avg Results'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

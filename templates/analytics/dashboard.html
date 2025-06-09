@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard | Realtor{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="analytics-dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Analytics Dashboard</h1>
+            <div class="dashboard-controls">
+                <form method="get" class="date-range-form">
+                    <label for="days">Time Period:</label>
+                    <select name="days" id="days" onchange="this.form.submit()">
+                        <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                        <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                        <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                        <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+                    </select>
+                </form>
+                <div class="dashboard-actions">
+                    <a href="{% url 'analytics:export' %}?type=pageviews&days={{ days }}" class="btn btn-outline">Export Data</a>
+                    <a href="{% url 'analytics:properties' %}" class="btn btn-primary">Property Analytics</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="icon-eye"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value">{{ total_page_views }}</h3>
+                    <p class="stat-label">Page Views</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="icon-home"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value">{{ total_property_views }}</h3>
+                    <p class="stat-label">Property Views</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="icon-search"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-value">{{ total_searches }}</h3>
+                    <p class="stat-label">Searches</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h2 class="card-title">Page Views Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="pageViewsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h2 class="card-title">Most Viewed Properties</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Views</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for property in most_viewed_properties %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'properties:detail' property.slug %}">
+                                        {{ property.title }}
+                                    </a>
+                                </td>
+                                <td>{{ property.view_count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h2 class="card-title">Most Searched Terms</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Search Term</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for term in most_searched_terms %}
+                            <tr>
+                                <td>{{ term.query }}</td>
+                                <td>{{ term.search_count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'analytics:searches' %}" class="btn btn-text">View All Search Analytics</a>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h2 class="card-title">User Activity</h2>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Activity</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in user_activities %}
+                            <tr>
+                                <td>{{ activity.action|title }}</td>
+                                <td>{{ activity.count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/analytics.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Page views chart
+        const pageViewsData = {{ daily_views|safe }};
+        const labels = pageViewsData.map(item => new Date(item.day).toLocaleDateString());
+        const values = pageViewsData.map(item => item.count);
+        
+        const ctx = document.getElementById('pageViewsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Page Views',
+                    data: values,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

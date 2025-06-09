@@ -1,0 +1,172 @@
+{% load static %}
+
+{% for property in page_obj %}
+    <div class="property-card" data-property-id="{{ property.id }}">
+        <div class="property-image">
+            {% if property.images.first %}
+                <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}" loading="lazy">
+            {% else %}
+                <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ property.title }}" loading="lazy">
+            {% endif %}
+            
+            <div class="property-overlay">
+                <div class="property-actions">
+                    <button class="action-btn favorite-btn {% if property.id in user_favorites %}favorited{% endif %}" 
+                            hx-post="{% url 'properties:toggle_favorite' property.id %}"
+                            hx-target="this"
+                            hx-swap="outerHTML">
+                        <i class="{% if property.id in user_favorites %}icon-heart-filled{% else %}icon-heart{% endif %}"></i>
+                    </button>
+                    <a href="{{ property.get_absolute_url }}" class="action-btn view-btn">
+                        <i class="icon-eye"></i>
+                    </a>
+                    <button class="action-btn compare-btn" 
+                            data-property-id="{{ property.id }}"
+                            data-title="{{ property.title }}"
+                            data-price="{{ property.price }}"
+                            data-image="{% if property.images.first %}{{ property.images.first.image.url }}{% else %}{% static 'images/property-placeholder.jpg' %}{% endif %}"
+                            data-url="{{ property.get_absolute_url }}">
+                        <i class="icon-compare"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="property-badges">
+                <span class="badge badge-{{ property.listing_type }}">
+                    For {{ property.get_listing_type_display }}
+                </span>
+                {% if property.status == 'pending' %}
+                    <span class="badge badge-pending">Pending</span>
+                {% endif %}
+                {% if property.featured %}
+                    <span class="badge badge-featured">Featured</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="property-content">
+            <div class="property-price">
+                ${{ property.price|floatformat:0 }}
+                {% if property.listing_type == 'rent' %}/month{% endif %}
+                {% if property.price_per_sqft %}
+                    <span class="price-per-sqft">${{ property.price_per_sqft|floatformat:0 }}/sq ft</span>
+                {% endif %}
+            </div>
+            
+            <h3 class="property-title">
+                <a href="{{ property.get_absolute_url }}">{{ property.title }}</a>
+            </h3>
+            
+            <div class="property-location">
+                <i class="icon-location"></i>
+                {{ property.address }}, {{ property.location.name }}
+            </div>
+            
+            <div class="property-features">
+                <span class="feature">
+                    <i class="icon-bed"></i>
+                    {{ property.bedrooms }} bed{{ property.bedrooms|pluralize }}
+                </span>
+                <span class="feature">
+                    <i class="icon-bath"></i>
+                    {{ property.bathrooms }} bath{{ property.bathrooms|pluralize }}
+                </span>
+                <span class="feature">
+                    <i class="icon-area"></i>
+                    {{ property.square_feet|floatformat:0 }} sq ft
+                </span>
+                {% if property.garage_spaces %}
+                    <span class="feature">
+                        <i class="icon-car"></i>
+                        {{ property.garage_spaces }} garage
+                    </span>
+                {% endif %}
+            </div>
+            
+            <div class="property-meta">
+                <div class="property-stats">
+                    <span class="stat">
+                        <i class="icon-eye"></i>
+                        {{ property.view_count }} views
+                    </span>
+                    <span class="stat">
+                        <i class="icon-heart"></i>
+                        {{ property.favorite_count }} favorites
+                    </span>
+                </div>
+                
+                <div class="property-date">
+                    Listed {{ property.created_at|timesince }} ago
+                </div>
+            </div>
+            
+            <div class="property-agent">
+                <div class="agent-avatar">
+                    {% if property.agent.avatar %}
+                        <img src="{{ property.agent.avatar.url }}" alt="{{ property.agent.get_full_name }}">
+                    {% else %}
+                        <div class="avatar-placeholder">{{ property.agent.first_name|first }}{{ property.agent.last_name|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="agent-info">
+                    <div class="agent-name">{{ property.agent.get_full_name }}</div>
+                    <div class="agent-title">Real Estate Agent</div>
+                </div>
+                <div class="agent-contact">
+                    <a href="tel:{{ property.agent.phone }}" class="contact-btn">
+                        <i class="icon-phone"></i>
+                    </a>
+                    <a href="mailto:{{ property.agent.email }}" class="contact-btn">
+                        <i class="icon-email"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <div class="no-properties">
+        <div class="no-properties-icon">
+            <i class="icon-home"></i>
+        </div>
+        <h3>No Properties Found</h3>
+        <p>Try adjusting your search criteria or browse all available properties.</p>
+        <a href="{% url 'properties:list' %}" class="btn btn-primary">View All Properties</a>
+    </div>
+{% endfor %}
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        <nav class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-left"></i><i class="icon-chevron-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-left"></i>
+                </a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-link current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" class="page-link">
+                    <i class="icon-chevron-right"></i><i class="icon-chevron-right"></i>
+                </a>
+            {% endif %}
+        </nav>
+        
+        <div class="pagination-info">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </div>
+    </div>
+{% endif %}
