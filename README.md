@@ -1,282 +1,378 @@
-# 🏡 Realtor - Premium Real Estate Platform
-
-<div align="center">
+# 🏡 Django Realtor Website
 
 ![License MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Django 4.x](https://img.shields.io/badge/Django-4.x-green.svg)
 ![Status Active](https://img.shields.io/badge/status-active-green.svg)
 ![Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue.svg)
-![HTMX](https://img.shields.io/badge/HTMX-1.8+-orange.svg)
-
-*A comprehensive, modern real estate platform built with Django and HTMX*
-
-[🚀 Live Demo](#) • [📖 Documentation](#installation) • [🐛 Report Bug](#) • [💡 Request Feature](#)
-
-</div>
-
----
+![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.0-purple.svg)
 
 ## 📋 Table of Contents
 
 - [🌟 Overview](#-overview)
 - [✨ Features](#-features)
-- [🏗️ Architecture](#️-architecture)
 - [🛠️ Technology Stack](#️-technology-stack)
-- [📦 Installation](#-installation)
-- [🔧 Configuration](#-configuration)
-- [🚀 Usage](#-usage)
-- [📱 API Documentation](#-api-documentation)
+- [📁 Project Structure](#-project-structure)
+- [🚀 Installation](#-installation)
+- [💻 Usage](#-usage)
+- [🎯 Key Functionality](#-key-functionality)
+- [📱 User Roles](#-user-roles)
 - [🎨 Frontend Features](#-frontend-features)
-- [🔐 Security](#-security)
-- [📊 Analytics](#-analytics)
+- [🔧 Backend Architecture](#-backend-architecture)
+- [📊 Analytics & Tracking](#-analytics--tracking)
+- [🛡️ Security Features](#️-security-features)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 
----
-
 ## 🌟 Overview
 
-**Realtor** is a comprehensive, full-stack real estate platform designed to connect property buyers, sellers, and real estate agents in a seamless digital environment. Built with modern web technologies, it provides an intuitive interface for property management, advanced search capabilities, and real-time communication features.
-
-### 🎯 Mission
-To revolutionize the real estate industry by providing a user-friendly, feature-rich platform that simplifies property transactions and enhances the experience for all stakeholders.
-
----
+**Django Realtor Website** is a comprehensive, full-stack real estate platform built with Django 4.x that connects property buyers, sellers, and real estate agents in a seamless digital environment. This modern web application provides a complete solution for property listings, agent management, user dashboards, and advanced search capabilities.
 
 ## ✨ Features
 
-### 🏠 **Property Management**
-- **Advanced Property Listings** with high-resolution image galleries
-- **Interactive Maps** with geolocation and neighborhood insights
-- **Virtual Tours** and 360° property views
-- **Detailed Property Information** including specifications, amenities, and history
-- **Price Analytics** with market trends and comparative analysis
-- **MLS Integration** for comprehensive property data
+### 🏠 Property Management
+- **Advanced Property Listings** with detailed information, high-quality image galleries, and virtual tours
+- **Smart Search & Filtering** by location, price range, property type, bedrooms, bathrooms, and custom criteria
+- **Interactive Maps** with property markers and neighborhood information
+- **Favorites System** allowing users to save and organize preferred properties
+- **Property Analytics** tracking views, favorites, and engagement metrics
 
-### 👥 **User Management**
-- **Multi-Role System**: Buyers, Sellers, Agents, and Administrators
-- **Personalized Dashboards** with customized content
-- **Profile Management** with verification systems
-- **Favorites and Watchlists** for saved properties
-- **Search History** and saved search alerts
-- **Document Management** for property-related files
+### 👥 User Management
+- **Multi-Role System** supporting Buyers, Sellers, Agents, and Administrators
+- **Comprehensive User Profiles** with customizable preferences and contact information
+- **Personalized Dashboards** showing saved properties, search history, and account analytics
+- **Advanced Authentication** with secure login, registration, and password management
 
-### 🔍 **Advanced Search & Filtering**
-- **Real-time Search** with HTMX-powered instant results
-- **Smart Filters**: Price range, location, property type, amenities
-- **Map-based Search** with boundary drawing capabilities
-- **Saved Searches** with email notifications
-- **Auto-suggestions** and search history
-- **Voice Search** capabilities (coming soon)
+### 🏢 Agent & Agency System
+- **Professional Agent Profiles** showcasing experience, specializations, and client reviews
+- **Agency Management** with team structures and company branding
+- **Performance Analytics** tracking sales, listings, and client interactions
+- **Review & Rating System** for transparent agent evaluation
 
-### 💬 **Communication System**
-- **Real-time Messaging** between agents and clients
-- **Appointment Scheduling** with calendar integration
-- **Property Inquiries** with automated responses
-- **Email Notifications** for important updates
-- **SMS Integration** for urgent communications
-- **Video Call Integration** (coming soon)
+### 💬 Communication & Messaging
+- **Integrated Messaging System** connecting buyers with agents
+- **Contact Forms** for property inquiries and general communication
+- **Automated Notifications** for new listings, price changes, and saved search alerts
 
-### 📊 **Analytics & Reporting**
-- **Property Performance Metrics** with detailed insights
-- **User Behavior Analytics** for improved UX
-- **Market Trend Analysis** with predictive modeling
-- **Agent Performance Dashboards** with KPIs
-- **Custom Reports** with export capabilities
-- **Real-time Statistics** and data visualization
-
-### 🔐 **Security & Privacy**
-- **Multi-factor Authentication** (MFA)
-- **Role-based Access Control** (RBAC)
-- **Data Encryption** at rest and in transit
-- **GDPR Compliance** with privacy controls
-- **Audit Logging** for all system activities
-- **Secure File Upload** with virus scanning
-
----
-
-## 🏗️ Architecture
-
-### **System Architecture**
-\`\`\`
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend       │    │   Database      │
-│                 │    │                 │    │                 │
-│ • HTML/CSS/JS   │◄──►│ • Django 4.x    │◄──►│ • PostgreSQL    │
-│ • HTMX          │    │ • REST APIs     │    │ • Redis Cache   │
-│ • Bootstrap     │    │ • WebSockets    │    │ • File Storage  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   CDN/Static    │    │   Task Queue    │    │   Monitoring    │
-│                 │    │                 │    │                 │
-│ • Images        │    │ • Celery        │    │ • Logging       │
-│ • CSS/JS        │    │ • Email Tasks   │    │ • Metrics       │
-│ • Documents     │    │ • Notifications │    │ • Health Checks │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-\`\`\`
-
-### **Application Structure**
-\`\`\`
-realtor_project/
-├── 🏠 apps/
-│   ├── 🔧 core/           # Core functionality and utilities
-│   ├── 🏘️ properties/     # Property management system
-│   ├── 👤 users/          # User management and profiles
-│   ├── 🤝 agents/         # Agent management and agencies
-│   ├── 🔍 search/         # Advanced search functionality
-│   ├── 💬 messaging/      # Communication system
-│   ├── 🔐 accounts/       # Authentication and authorization
-│   └── 📊 analytics/      # Analytics and reporting
-├── 🎨 templates/          # HTML templates
-├── 📁 static/             # CSS, JavaScript, images
-├── 🗄️ media/             # User-uploaded files
-└── ⚙️ config/            # Configuration files
-\`\`\`
-
----
+### 📊 Analytics & Insights
+- **Real-time Analytics Dashboard** for administrators and agents
+- **Property Performance Tracking** with view counts, engagement metrics, and market trends
+- **User Behavior Analysis** including search patterns and browsing history
+- **Custom Reports** for business intelligence and decision making
 
 ## 🛠️ Technology Stack
 
-### **Backend Technologies**
-- **🐍 Python 3.8+** - Core programming language
-- **🎯 Django 4.x** - Web framework with MVT architecture
-- **🗄️ PostgreSQL** - Primary database with advanced features
-- **⚡ Redis** - Caching and session storage
-- **📋 Celery** - Asynchronous task processing
-- **🔌 Django REST Framework** - API development
-- **🔐 Django Allauth** - Authentication system
+### Backend Technologies
+- **Django 4.x** - Robust Python web framework
+- **PostgreSQL** - Advanced relational database
+- **Redis** - High-performance caching and session storage
+- **Celery** - Asynchronous task processing
+- **Django REST Framework** - API development
+- **Pillow** - Advanced image processing
 
-### **Frontend Technologies**
-- **🌐 HTML5/CSS3** - Modern markup and styling
-- **⚡ JavaScript ES6+** - Interactive functionality
-- **🔄 HTMX** - Dynamic content without complex JavaScript
-- **🎨 Bootstrap 5** - Responsive UI framework
-- **📊 Chart.js** - Data visualization
-- **🗺️ Leaflet.js** - Interactive maps
+### Frontend Technologies
+- **HTML5 & CSS3** - Modern semantic markup and styling
+- **Bootstrap 5** - Responsive UI framework
+- **JavaScript (ES6+)** - Interactive client-side functionality
+- **HTMX** - Dynamic content loading without page refreshes
+- **Chart.js** - Beautiful data visualizations and analytics
 
-### **Development & Deployment**
-- **🐳 Docker** - Containerization
-- **🔧 Docker Compose** - Multi-container orchestration
-- **📦 pip** - Python package management
-- **🔍 Django Debug Toolbar** - Development debugging
-- **✅ pytest** - Testing framework
-- **📝 Black** - Code formatting
+### Development Tools
+- **Docker & Docker Compose** - Containerized development environment
+- **Git** - Version control and collaboration
+- **Whitenoise** - Static file serving for production
+- **Django Debug Toolbar** - Development debugging tools
 
-### **Third-Party Integrations**
-- **📧 SendGrid/Mailgun** - Email services
-- **💳 Stripe** - Payment processing
-- **🗺️ Google Maps API** - Mapping services
-- **☁️ AWS S3** - File storage
-- **📱 Twilio** - SMS notifications
+## 📁 Project Structure
 
----
-
-## 📦 Installation
-
-### **Prerequisites**
-- Python 3.8 or higher
-- PostgreSQL 13+
-- Redis 6+
-- Node.js 14+ (for frontend assets)
-- Git
-
-### **Quick Start with Docker** 🐳
-\`\`\`bash
-# Clone the repository
-git clone https://github.com/yourusername/realtor.git
-cd realtor
-
-# Start with Docker Compose
-docker-compose up -d
-
-# Run migrations
-docker-compose exec web python manage.py migrate
-
-# Create superuser
-docker-compose exec web python manage.py createsuperuser
-
-# Load sample data
-docker-compose exec web python manage.py loaddata fixtures/sample_data.json
+\`\`\`
+realtor_project/
+├── 📁 apps/                          # Django applications
+│   ├── 📁 core/                      # Core functionality and home pages
+│   ├── 📁 properties/                # Property listings and management
+│   ├── 📁 users/                     # User profiles and authentication
+│   ├── 📁 agents/                    # Agent and agency management
+│   ├── 📁 accounts/                  # Authentication system
+│   ├── 📁 search/                    # Advanced search functionality
+│   ├── 📁 messaging/                 # Communication system
+│   └── 📁 analytics/                 # Data analytics and tracking
+├── 📁 templates/                     # HTML templates
+│   ├── 📁 pages/                     # Static pages (home, about, contact)
+│   ├── 📁 properties/                # Property-related templates
+│   ├── 📁 users/                     # User dashboard templates
+│   ├── 📁 agents/                    # Agent profile templates
+│   ├── 📁 accounts/                  # Authentication templates
+│   └── 📁 partials/                  # Reusable template components
+├── 📁 static/                        # Static assets
+│   ├── 📁 css/                       # Stylesheets
+│   ├── 📁 js/                        # JavaScript files
+│   └── 📁 images/                    # Static images
+├── 📁 media/                         # User-uploaded content
+├── 📁 realtor_project/               # Django project settings
+│   ├── 📁 settings/                  # Environment-specific settings
+│   │   ├── base.py                   # Common settings
+│   │   ├── development.py            # Development configuration
+│   │   └── production.py             # Production configuration
+│   ├── urls.py                       # URL routing
+│   └── wsgi.py                       # WSGI configuration
+├── 📄 requirements.txt               # Python dependencies
+├── 📄 docker-compose.yml             # Docker services configuration
+├── 📄 Dockerfile                     # Container definition
+└── 📄 manage.py                      # Django management script
 \`\`\`
 
-### **Manual Installation** 🔧
-\`\`\`bash
-# Clone and setup
-git clone https://github.com/yourusername/realtor.git
-cd realtor
+## 🚀 Installation
 
-# Create virtual environment
+### Prerequisites
+- Python 3.8 or higher
+- PostgreSQL 12+
+- Redis server
+- Git
+
+### Quick Start
+
+1. **Clone the repository**
+\`\`\`bash
+git clone https://github.com/SIRI-bit-tech/realtor
+cd django-realtor-website
+\`\`\`
+
+2. **Create virtual environment**
+\`\`\`bash
 python -m venv realtor_env
 source realtor_env/bin/activate  # On Windows: realtor_env\Scripts\activate
+\`\`\`
 
-# Install dependencies
+3. **Install dependencies**
+\`\`\`bash
 pip install -r requirements.txt
+\`\`\`
 
-# Setup environment variables
+4. **Environment setup**
+\`\`\`bash
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your database and configuration settings
+\`\`\`
 
-# Database setup
+5. **Database setup**
+\`\`\`bash
+python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
+\`\`\`
 
-# Collect static files
-python manage.py collectstatic
+6. **Load sample data (optional)**
+\`\`\`bash
+python manage.py loaddata fixtures/sample_data.json
+\`\`\`
 
-# Run development server
+7. **Run development server**
+\`\`\`bash
 python manage.py runserver
 \`\`\`
 
----
+Visit `http://localhost:8000` to see the application.
 
-## 🔧 Configuration
+### Docker Installation
 
-### **Environment Variables**
 \`\`\`bash
-# Database Configuration
-DATABASE_URL=postgresql://user:password@localhost:5432/realtor_db
-REDIS_URL=redis://localhost:6379/0
+# Clone and navigate to project
+git clone https://github.com/SIRI-bit-tech/realtor
+cd django-realtor-website
 
-# Security
-SECRET_KEY=your-secret-key-here
-DEBUG=False
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+# Build and run with Docker Compose
+docker-compose up --build
 
-# Email Configuration
-EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-
-# Third-party APIs
-GOOGLE_MAPS_API_KEY=your-google-maps-key
-STRIPE_PUBLIC_KEY=your-stripe-public-key
-STRIPE_SECRET_KEY=your-stripe-secret-key
-
-# File Storage
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-AWS_STORAGE_BUCKET_NAME=your-s3-bucket
+# Create superuser
+docker-compose exec web python manage.py createsuperuser
 \`\`\`
 
-### **Database Configuration**
-```python
-# settings/production.py
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRES_DB'),
-        'USER': env('POSTGRES_USER'),
-        'PASSWORD': env('POSTGRES_PASSWORD'),
-        'HOST': env('POSTGRES_HOST'),
-        'PORT': env('POSTGRES_PORT'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-    }
-}
+## 💻 Usage
+
+### For Property Buyers
+1. **Browse Properties** - Search and filter properties by location, price, and features
+2. **Save Favorites** - Create a personal list of preferred properties
+3. **Contact Agents** - Directly message listing agents for inquiries
+4. **Track Searches** - Save search criteria for automatic notifications
+5. **View Analytics** - See your browsing history and saved properties
+
+### For Real Estate Agents
+1. **Manage Listings** - Add, edit, and update property information
+2. **Track Performance** - Monitor property views, inquiries, and engagement
+3. **Client Communication** - Respond to buyer inquiries and messages
+4. **Profile Management** - Showcase expertise, certifications, and client reviews
+5. **Analytics Dashboard** - Access detailed performance metrics and insights
+
+### For Administrators
+1. **User Management** - Oversee user accounts, agents, and agencies
+2. **Content Moderation** - Review and approve property listings
+3. **System Analytics** - Monitor platform usage and performance metrics
+4. **Configuration** - Manage site settings, property types, and locations
+
+## 🎯 Key Functionality
+
+### Advanced Search System
+- **Geolocation-based Search** with radius filtering
+- **Multi-criteria Filtering** including price range, property features, and amenities
+- **Smart Autocomplete** with real-time suggestions
+- **Saved Search Alerts** with email notifications
+- **Map-based Property Discovery** with interactive markers
+
+### Property Management
+- **Comprehensive Property Profiles** with detailed descriptions and specifications
+- **Professional Photography** with optimized image galleries
+- **Virtual Tour Integration** for immersive property viewing
+- **Price History Tracking** and market analysis
+- **Automatic MLS Integration** capabilities
+
+### User Experience
+- **Responsive Design** optimized for all devices and screen sizes
+- **Progressive Web App** features for mobile users
+- **Fast Loading Times** with optimized caching and CDN integration
+- **Accessibility Compliance** following WCAG 2.1 guidelines
+- **SEO Optimization** for maximum search engine visibility
+
+## 📱 User Roles
+
+### 🏠 Buyers
+- Browse and search property listings
+- Save favorite properties and create watchlists
+- Contact agents and schedule viewings
+- Track viewing history and preferences
+- Receive notifications for new matching properties
+
+### 🏢 Sellers
+- List properties with comprehensive details
+- Upload high-quality photos and virtual tours
+- Track property performance and viewer analytics
+- Manage pricing and availability
+- Communicate with potential buyers
+
+### 👨‍💼 Agents
+- Manage multiple property listings
+- Access detailed client and property analytics
+- Handle client communications and inquiries
+- Showcase professional credentials and reviews
+- Generate performance reports and market insights
+
+### 🛡️ Administrators
+- Oversee platform operations and user management
+- Monitor system performance and analytics
+- Manage content moderation and quality control
+- Configure platform settings and features
+- Access comprehensive business intelligence reports
+
+## 🎨 Frontend Features
+
+### Modern User Interface
+- **Clean, Professional Design** with intuitive navigation
+- **Dark/Light Theme Support** for user preference
+- **Smooth Animations** and interactive elements
+- **Mobile-First Responsive Design** ensuring optimal experience across devices
+- **Accessibility Features** including screen reader support and keyboard navigation
+
+### Interactive Elements
+- **HTMX-Powered** dynamic content loading without page refreshes
+- **Real-time Search** with instant results and filtering
+- **Interactive Property Maps** with clustering and detailed markers
+- **Image Galleries** with lightbox viewing and zoom capabilities
+- **Form Validation** with real-time feedback and error handling
+
+## 🔧 Backend Architecture
+
+### Database Design
+- **Optimized PostgreSQL Schema** with proper indexing and relationships
+- **Scalable Data Models** supporting complex property and user relationships
+- **Efficient Querying** with select_related and prefetch_related optimizations
+- **Data Integrity** with proper constraints and validation
+- **Migration Management** for seamless database updates
+
+### API Architecture
+- **RESTful API Design** following industry best practices
+- **Authentication & Authorization** with JWT token support
+- **Rate Limiting** for API protection and fair usage
+- **Comprehensive Documentation** with automatic API docs generation
+- **Versioning Support** for backward compatibility
+
+### Performance Optimization
+- **Redis Caching** for frequently accessed data
+- **Database Query Optimization** with efficient ORM usage
+- **Static File Optimization** with compression and CDN support
+- **Background Task Processing** with Celery for heavy operations
+- **Monitoring & Logging** for performance tracking and debugging
+
+## 📊 Analytics & Tracking
+
+### User Analytics
+- **Page View Tracking** with detailed user journey mapping
+- **Search Behavior Analysis** including popular searches and filters
+- **Property Engagement Metrics** tracking favorites, views, and inquiries
+- **User Retention Analysis** with cohort tracking and engagement metrics
+- **Conversion Tracking** from property views to contact submissions
+
+### Business Intelligence
+- **Property Performance Dashboards** with visual analytics
+- **Agent Performance Metrics** including listing success rates
+- **Market Trend Analysis** with pricing and demand insights
+- **Geographic Analytics** showing popular locations and neighborhoods
+- **Revenue Tracking** and commission management tools
+
+## 🛡️ Security Features
+
+### Data Protection
+- **HTTPS Enforcement** with SSL/TLS encryption
+- **CSRF Protection** on all forms and sensitive operations
+- **SQL Injection Prevention** through Django ORM usage
+- **XSS Protection** with proper input sanitization
+- **Secure File Uploads** with type validation and scanning
+
+### User Security
+- **Strong Password Requirements** with complexity validation
+- **Two-Factor Authentication** support for enhanced security
+- **Session Management** with secure cookie configuration
+- **Account Lockout Protection** against brute force attacks
+- **Privacy Controls** with granular data sharing settings
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+### Getting Started
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Add tests for new functionality
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Development Guidelines
+- Follow PEP 8 Python style guidelines
+- Write comprehensive tests for new features
+- Update documentation for any API changes
+- Ensure responsive design for frontend modifications
+- Test across multiple browsers and devices
+
+### Reporting Issues
+- Use the GitHub issue tracker for bug reports
+- Provide detailed reproduction steps
+- Include system information and error logs
+- Search existing issues before creating new ones
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- **Django Community** for the excellent web framework
+- **Bootstrap Team** for the responsive UI components
+- **Contributors** who have helped improve this project
+- **Real Estate Professionals** who provided industry insights
+
+---
+
+**Made with ❤️ by SiriDev**
+
+*For questions, support, or collaboration opportunities, please contact us at [siritech001@gmail.com](mailto:siritech001@gmail.com).*
