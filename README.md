@@ -1,4 +1,4 @@
-# 🏡 Django Realtor Website
+# 🏡 Nuvana Realty Platform
 
 ![License MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Django 4.x](https://img.shields.io/badge/Django-4.x-green.svg)
@@ -25,7 +25,7 @@
 
 ## 🌟 Overview
 
-**Django Realtor Website** is a comprehensive, full-stack real estate platform built with Django 4.x that connects property buyers, sellers, and real estate agents in a seamless digital environment. This modern web application provides a complete solution for property listings, agent management, user dashboards, and advanced search capabilities.
+**Nuvana Realty Platform** is a comprehensive, full-stack real estate platform built with Django 4.x that connects property buyers, sellers, and real estate agents in a seamless digital environment. This modern, scalable platform features advanced search, agent and property management, messaging, analytics, and more—all with a professional, branded design system for Nuvana Realty.
 
 ## ✨ Features
 
@@ -84,7 +84,7 @@
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 realtor_project/
 ├── 📁 apps/                          # Django applications
 │   ├── 📁 core/                      # Core functionality and home pages
@@ -118,7 +118,7 @@ realtor_project/
 ├── 📄 docker-compose.yml             # Docker services configuration
 ├── 📄 Dockerfile                     # Container definition
 └── 📄 manage.py                      # Django management script
-\`\`\`
+```
 
 ## 🚀 Installation
 
@@ -376,3 +376,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Made with ❤️ by SiriDev**
 
 *For questions, support, or collaboration opportunities, please contact us at [siritech001@gmail.com](mailto:siritech001@gmail.com).*
+
+&copy; 2024 Nuvana Realty. All rights reserved.

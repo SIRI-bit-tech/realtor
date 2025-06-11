@@ -240,7 +240,7 @@ def contact_agent(request, agent_id):
     if not all([name, email, message]):
         return render(request, 'partials/contact_error.html', {'message': 'All fields are required.'})
 
-    subject = f"New message from {name} via Realtor Agent Contact"
+    subject = f"New message from {name} via Nuvana Realty Agent Contact"
     context = {
         'name': name,
         'email': email,
