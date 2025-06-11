@@ -20,7 +20,7 @@
             <div class="col-lg-8">
                 <div class="contact-form-wrapper">
                     <h2>Send us a Message</h2>
-                    <form class="contact-form" hx-post="{% url 'core:contact' %}" hx-target="#contact-result">
+                    <form id="contact-form" method="POST" hx-post="{% url 'core:contact' %}" hx-target="#contact-result">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-6">

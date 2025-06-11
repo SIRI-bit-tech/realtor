@@ -9,4 +9,5 @@ urlpatterns = [
     path('agencies/<slug:slug>/', views.agency_detail, name='agency_detail'),
     path('<str:username>/', views.agent_detail, name='agent_detail'),
     path('review/<int:agent_id>/', views.submit_review, name='submit_review'),
+    path('contact/<int:agent_id>/', views.contact_agent, name='contact_agent'),
 ]

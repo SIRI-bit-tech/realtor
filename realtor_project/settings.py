@@ -7,7 +7,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Environment variables
 env = environ.Env(
-    DEBUG=(bool, True)  # Default to True for development
+    DEBUG=(bool, True),  # Default to True for development
+    EMAIL_BACKEND=(str, 'django.core.mail.backends.smtp.EmailBackend'),
+    EMAIL_HOST=(str, 'smtp.gmail.com'),
+    EMAIL_PORT=(int, 587),
+    EMAIL_USE_TLS=(bool, True),
+    EMAIL_HOST_USER=(str, 'your_email@gmail.com'),
+    EMAIL_HOST_PASSWORD=(str, 'your_app_password'),
+    DEFAULT_FROM_EMAIL=(str, 'siricoding1@gmail.com'),
+    CONTACT_EMAIL=(str, 'siritech@icloud.com'),
 )
 
 # Take environment variables from .env file
@@ -200,15 +208,14 @@ if not DEBUG or env('CELERY_BROKER_URL', default=None):
     CELERY_TIMEZONE = TIME_ZONE
 
 # Email Configuration
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-    EMAIL_HOST = env('EMAIL_HOST', default='')
-    EMAIL_PORT = env('EMAIL_PORT', default=587)
-    EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='your_email@gmail.com')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='your_app_password')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='siricoding1@gmail.com')
+CONTACT_EMAIL = env('CONTACT_EMAIL', default='siritech@icloud.com')
 
 # Security Settings
 SECURE_BROWSER_XSS_FILTER = True

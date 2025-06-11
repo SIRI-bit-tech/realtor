@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>New Contact Message</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; color: #222; margin: 0; padding: 0; }
+        .email-container { background: #fff; max-width: 520px; margin: 32px auto; border-radius: 12px; box-shadow: 0 4px 24px rgba(41,121,255,0.08); overflow: hidden; border: 1px solid #e3e8ee; }
+        .email-header { background: #2979ff; padding: 24px 0; text-align: center; }
+        .email-header img { height: 48px; }
+        .email-title { color: #fff; font-size: 1.4em; margin: 12px 0 0 0; font-weight: 700; }
+        .email-body { padding: 32px 32px 24px 32px; }
+        .info-label { color: #2979ff; font-weight: 600; margin-bottom: 2px; }
+        .info-value { margin-bottom: 16px; font-size: 1.08em; }
+        .message-box { background: #f4faff; border-left: 4px solid #2979ff; padding: 18px; border-radius: 8px; margin: 18px 0; color: #222; font-size: 1.1em; }
+        .email-footer { background: #f8fafc; color: #888; text-align: center; font-size: 0.95em; padding: 18px 0 12px 0; border-top: 1px solid #e3e8ee; }
+        a { color: #2979ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <img src="{{ logo_url }}" alt="Realtor Logo">
+            <div class="email-title">New Contact Message</div>
+        </div>
+        <div class="email-body">
+            <div class="info-label">From:</div>
+            <div class="info-value">{{ name }} ({{ email }})</div>
+            {% if phone %}
+            <div class="info-label">Phone:</div>
+            <div class="info-value">{{ phone }}</div>
+            {% endif %}
+            <div class="info-label">Message:</div>
+            <div class="message-box">{{ message|linebreaksbr }}</div>
+        </div>
+        <div class="email-footer">
+            Sent via <a href="{{ site_url }}">Realtor Real Estate Platform</a>
+        </div>
+    </div>
+</body>
+</html> 

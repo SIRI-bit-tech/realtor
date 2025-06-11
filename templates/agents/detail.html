@@ -153,7 +153,8 @@
                     <!-- Contact Card -->
                     <div class="contact-card">
                         <h3>Contact {{ agent.user.first_name }}</h3>
-                        <form class="contact-form" hx-post="{% url 'agents:submit_review' agent.id %}" hx-target="#contact-result">
+                        <form class="contact-form" method="POST" hx-post="{% url 'agents:contact_agent' agent.id %}" hx-target="#contact-result">
+                            {% csrf_token %}
                             <div class="form-group">
                                 <input type="text" name="name" placeholder="Your Name" class="form-control" required>
                             </div>

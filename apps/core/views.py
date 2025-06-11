@@ -6,6 +6,9 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_http_methods
 from apps.properties.models import Property, PropertyType, Location
 from apps.agents.models import Agent, Agency
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
 
 
 def home(request):
@@ -63,25 +66,37 @@ def about(request):
 def contact(request):
     """Contact page with form and map"""
     if request.method == 'POST':
-        # Handle contact form submission
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         message = request.POST.get('message')
 
-        # Here you would typically send an email or save to database
-        # For now, we'll just return a success response
+        if not all([name, email, message]):
+            if request.htmx:
+                return render(request, 'partials/contact_error.html', {'message': 'All fields are required.'})
+            return render(request, 'pages/contact.html', {'error': 'All fields are required.'})
 
-        if request.htmx:
-            return render(request, 'partials/contact_success.html', {
-                'name': name
-            })
-
-        return render(request, 'pages/contact.html', {
-            'success': True,
-            'name': name
-        })
-
+        subject = f"New Contact Message from {name}"
+        context = {
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'message': message,
+            'site_url': request.build_absolute_uri('/'),
+            'logo_url': request.build_absolute_uri('/static/images/logo.png'),
+        }
+        html_message = render_to_string('emails/general_contact.html', context)
+        plain_message = f"Name: {name}\nEmail: {email}\nPhone: {phone}\n\nMessage:\n{message}"
+        recipient = [getattr(settings, 'CONTACT_EMAIL', settings.DEFAULT_FROM_EMAIL)]
+        try:
+            send_mail(subject, plain_message, settings.DEFAULT_FROM_EMAIL, recipient, fail_silently=False, html_message=html_message)
+            if request.htmx:
+                return render(request, 'partials/contact_success.html', {'name': name})
+            return render(request, 'pages/contact.html', {'success': True, 'name': name})
+        except Exception as e:
+            if request.htmx:
+                return render(request, 'partials/contact_error.html', {'message': 'Failed to send message. Please try again later.'})
+            return render(request, 'pages/contact.html', {'error': 'Failed to send message. Please try again later.'})
     return render(request, 'pages/contact.html')
 
 

@@ -3,6 +3,10 @@ from django.db.models import Q, Avg, Count
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
 from .models import Agent, Agency, AgentReview
+from django.core.mail import send_mail
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
 
 
 def agent_list(request):
@@ -222,4 +226,36 @@ def submit_review(request, agent_id):
     return render(request, 'partials/review_success.html', {
         'review': review
     })
+
+
+@require_http_methods(["POST"])
+@csrf_exempt  # If you use HTMX, ensure CSRF is handled or exempted
+def contact_agent(request, agent_id):
+    agent = get_object_or_404(Agent, id=agent_id)
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+    phone = request.POST.get('phone', '').strip()
+    message = request.POST.get('message', '').strip()
+
+    if not all([name, email, message]):
+        return render(request, 'partials/contact_error.html', {'message': 'All fields are required.'})
+
+    subject = f"New message from {name} via Realtor Agent Contact"
+    context = {
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'message': message,
+        'agent': agent,
+        'site_url': request.build_absolute_uri('/'),
+        'logo_url': request.build_absolute_uri('/static/images/logo.png'),
+    }
+    html_message = render_to_string('emails/agent_contact.html', context)
+    plain_message = f"Name: {name}\nEmail: {email}\nPhone: {phone}\n\nMessage:\n{message}"
+    recipient = [agent.user.email]
+    try:
+        send_mail(subject, plain_message, settings.DEFAULT_FROM_EMAIL, recipient, fail_silently=False, html_message=html_message)
+        return render(request, 'partials/contact_success.html', {'name': name})
+    except Exception as e:
+        return render(request, 'partials/contact_error.html', {'message': 'Failed to send message. Please try again later.'})
 
