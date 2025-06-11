@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages | Realtor{% endblock %}
+
+{% block content %}
+<div class="messaging-page">
+    <div class="container">
+        <div class="messaging-header">
+            <h1>Messages</h1>
+            <div class="messaging-stats">
+                <span class="stat">{{ conversations.count }} Conversations</span>
+                <span class="stat">{{ unread_count }} Unread</span>
+            </div>
+        </div>
+
+        <div class="messaging-content">
+            {% if conversations %}
+                <div class="conversations-list" style="display: flex; flex-direction: column; gap: 24px;">
+                    {% for conversation in conversations %}
+                        <div class="conversation-item {% if conversation.unread_count > 0 %}unread{% endif %}" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: box-shadow 0.2s;">
+                            <a href="{% url 'messaging:conversation_detail' conversation.id %}" class="conversation-link" style="display: flex; align-items: center; padding: 24px 32px; text-decoration: none; color: inherit; gap: 24px; border-radius: 16px;">
+                                <div class="conversation-avatar" style="flex-shrink: 0;">
+                                    {% if conversation.other_user.avatar %}
+                                        <img src="{{ conversation.other_user.avatar.url }}" alt="{{ conversation.other_user.get_full_name }}" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;">
+                                    {% else %}
+                                        <div class="avatar-placeholder" style="width: 56px; height: 56px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555; font-size: 1.3em;">{{ conversation.other_user.first_name|first }}{{ conversation.other_user.last_name|first }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="conversation-content" style="flex: 1; min-width: 0;">
+                                    <div class="conversation-header" style="display: flex; align-items: center; justify-content: space-between;">
+                                        <h3 class="conversation-name" style="margin: 0; font-size: 1.15em; font-weight: 700; color: #1a3c4c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ conversation.other_user.get_full_name }}</h3>
+                                        <span class="conversation-time" style="font-size: 0.98em; color: #888; margin-left: 16px; white-space: nowrap;">{{ conversation.last_message.timestamp|timesince }} ago</span>
+                                    </div>
+                                    {% if conversation.property %}
+                                        <div class="conversation-property" style="color: #4a90e2; font-size: 0.98em; margin: 2px 0 6px 0; display: flex; align-items: center; gap: 6px;">
+                                            <i class="fas fa-home"></i>
+                                            {{ conversation.property.title }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="conversation-preview" style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="last-message" style="color: #222; font-size: 1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 350px;">{{ conversation.last_message.content|truncatewords:14 }}</span>
+                                        {% if conversation.unread_count > 0 %}
+                                            <span class="unread-badge" style="background: #e74c3c; color: #fff; border-radius: 12px; padding: 2px 10px; font-size: 0.95em; font-weight: 600; margin-left: 8px;">{{ conversation.unread_count }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% include 'partials/empty_conversations.html' %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messaging.css' %}">
+{% endblock %}

@@ -23,6 +23,9 @@ function initAnalyticsDashboard() {
 
   // Initialize table sorting if needed
   initTableSorting()
+
+  // Initialize real-time updates
+  initRealTimeUpdates()
 }
 
 function handleExport(e) {
@@ -189,12 +192,112 @@ function showNotification(message, type = "info") {
   notification.className = `notification notification-${type}`
   notification.textContent = message
 
+  // Add notification styles
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+  `
+
+  // Set background color based on type
+  switch (type) {
+    case "success":
+      notification.style.backgroundColor = "#10b981"
+      break
+    case "error":
+      notification.style.backgroundColor = "#ef4444"
+      break
+    case "info":
+    default:
+      notification.style.backgroundColor = "#3b82f6"
+      break
+  }
+
   document.body.appendChild(notification)
 
   // Auto-remove after 3 seconds
   setTimeout(() => {
     notification.remove()
   }, 3000)
+}
+
+// Real-time updates functionality
+function initRealTimeUpdates() {
+  // Update statistics every 30 seconds
+  setInterval(updateStatistics, 30000)
+
+  // Update charts every 60 seconds
+  setInterval(updateCharts, 60000)
+}
+
+function updateStatistics() {
+  const days = new URLSearchParams(window.location.search).get("days") || 30
+
+  fetch(`/analytics/api/stats/?days=${days}`)
+    .then((response) => response.json())
+    .then((data) => {
+      // Update stat cards
+      updateStatCard("total_page_views", data.total_page_views)
+      updateStatCard("total_property_views", data.total_property_views)
+      updateStatCard("total_searches", data.total_searches)
+    })
+    .catch((error) => {
+      console.error("Error updating statistics:", error)
+    })
+}
+
+function updateStatCard(statName, newValue) {
+  const statElement = document.querySelector(`[data-stat="${statName}"]`)
+  if (statElement) {
+    const currentValue = Number.parseInt(statElement.textContent)
+    if (currentValue !== newValue) {
+      // Animate the change
+      animateNumber(statElement, currentValue, newValue)
+    }
+  }
+}
+
+function animateNumber(element, start, end) {
+  const duration = 1000 // 1 second
+  const startTime = performance.now()
+
+  function update(currentTime) {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+
+    const current = Math.floor(start + (end - start) * progress)
+    element.textContent = current.toLocaleString()
+
+    if (progress < 1) {
+      requestAnimationFrame(update)
+    }
+  }
+
+  requestAnimationFrame(update)
+}
+
+function updateCharts() {
+  const days = new URLSearchParams(window.location.search).get("days") || 30
+
+  fetch(`/analytics/api/chart-data/?days=${days}`)
+    .then((response) => response.json())
+    .then((data) => {
+      // Update page views chart if it exists
+      if (window.pageViewsChart) {
+        window.pageViewsChart.data.labels = data.daily_views.map((item) => new Date(item.day).toLocaleDateString())
+        window.pageViewsChart.data.datasets[0].data = data.daily_views.map((item) => item.count)
+        window.pageViewsChart.update()
+      }
+    })
+    .catch((error) => {
+      console.error("Error updating charts:", error)
+    })
 }
 
 // Chart.js default configuration

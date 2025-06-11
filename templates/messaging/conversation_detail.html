@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Conversation with {{ conversation.other_user.get_full_name }} | Realtor{% endblock %}
+
+{% block body_class %}no-footer{% endblock %}
+
+{% block content %}
+<style>
+:root {
+  --chat-bg: #f0f2f5;
+  --chat-header-bg: #fff;
+  --chat-bubble-sent: #2979ff;
+  --chat-bubble-received: #fff;
+  --chat-bubble-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  --chat-bubble-radius: 18px;
+  --chat-input-bg: #fff;
+  --chat-input-border: #d0d7de;
+}
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+body {
+  min-height: 100vh;
+  background: var(--chat-bg);
+}
+.chat-app-root {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  background: var(--chat-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 2000;
+}
+@media (min-width: 700px) {
+  .chat-app-root {
+    justify-content: center;
+  }
+}
+.chat-app-container {
+  width: 100vw;
+  max-width: 480px;
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--chat-bg);
+  position: relative;
+  box-sizing: border-box;
+}
+@media (min-width: 700px) {
+  .chat-app-container {
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0 auto;
+    max-width: 480px;
+    min-width: 350px;
+  }
+}
+.chat-app-header {
+  background: var(--chat-header-bg);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px 12px 18px;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: 60px;
+}
+.chat-app-header .back-btn {
+  color: #1a3c4c;
+  font-size: 1.3em;
+  margin-right: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+.chat-app-header .user-avatar img, .chat-app-header .avatar-placeholder {
+  width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+  background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555; font-size: 1.1em;
+}
+.chat-app-header .user-details {
+  flex: 1;
+  min-width: 0;
+}
+.chat-app-header .user-details h2 {
+  font-size: 1.08em;
+  margin: 0 0 2px 0;
+  font-weight: 700;
+  color: #1a3c4c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-app-header .user-details #presence-indicator {
+  font-size: 0.97em;
+  margin-top: 0;
+}
+.chat-app-header .property-context {
+  font-size: 0.93em;
+  color: #888;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-app-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 18px 8px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--chat-bg);
+  min-height: 0;
+}
+.chat-app-input {
+  background: var(--chat-input-bg);
+  padding: 10px 8px 10px 8px;
+  border-top: 1px solid #e0e0e0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.chat-app-input form {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  gap: 8px;
+}
+.chat-app-input textarea {
+  flex: 1;
+  border-radius: 16px;
+  border: 1.5px solid var(--chat-input-border);
+  padding: 10px 14px;
+  font-size: 1em;
+  min-height: 38px;
+  max-height: 90px;
+  resize: none;
+  background: #f7f9fa;
+  margin: 0;
+  box-sizing: border-box;
+}
+.chat-app-input button {
+  padding: 0 16px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 1.2em;
+  background: #2979ff;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(41,121,255,0.08);
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chat-app-input button:active {
+  background: #1565c0;
+}
+</style>
+<div class="chat-app-root">
+    <div class="chat-app-container">
+        <div class="chat-app-header">
+            <a href="{% url 'messaging:conversation_list' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+                <div class="user-avatar">
+                    {% if conversation.other_user.avatar %}
+                        <img src="{{ conversation.other_user.avatar.url }}" alt="{{ conversation.other_user.get_full_name }}">
+                    {% else %}
+                        <div class="avatar-placeholder">{{ conversation.other_user.first_name|first }}{{ conversation.other_user.last_name|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="user-details">
+                    <h2>{{ conversation.other_user.get_full_name }}</h2>
+                <div id="presence-indicator" style="font-size: 0.98em; margin-top: 2px; display: flex; align-items: center; gap: 6px;">
+                    <span id="presence-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #bbb;"></span>
+                    <span id="presence-text">Checking status...</span>
+                </div>
+                    {% if conversation.property %}
+                        <p class="property-context">
+                            <i class="fas fa-home"></i>
+                        {{ conversation.property.title }}
+                        </p>
+                    {% endif %}
+            </div>
+        </div>
+        <div class="chat-app-messages" id="messages-container">
+                {% for message in messages %}
+                    {% include 'partials/message_item.html' with message=message %}
+                {% endfor %}
+            </div>
+        <div class="chat-app-input">
+                <form class="message-form" 
+                      hx-post="{% url 'messaging:send_message' conversation.id %}"
+                      hx-target="#messages-container"
+                      hx-swap="beforeend"
+                      hx-on::after-request="this.reset(); scrollToBottom();">
+                    {% csrf_token %}
+                <textarea name="content" placeholder="Type your message..." rows="1" required></textarea>
+                <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/messaging.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/messaging.js' %}"></script>
+<script>
+function scrollToBottom() {
+    const container = document.getElementById('messages-container');
+    container.scrollTop = container.scrollHeight;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    scrollToBottom();
+
+    // WebSocket for real-time chat
+    const conversationId = "{{ conversation.id }}";
+    const userId = "{{ request.user.id }}";
+    const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const chatSocket = new WebSocket(
+        ws_scheme + '://' + window.location.host + '/ws/messaging/' + conversationId + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 'presence') {
+            if (data.user_id == {{ conversation.other_user.id }}) {
+                const dot = document.getElementById('presence-dot');
+                const text = document.getElementById('presence-text');
+                if (data.status === 'online') {
+                    dot.style.background = '#4caf50';
+                    text.textContent = 'Agent is Online';
+                } else if (data.status === 'offline' && data.last_seen) {
+                    dot.style.background = '#ff9800';
+                    const now = Math.floor(Date.now() / 1000);
+                    const mins = Math.floor((now - data.last_seen) / 60);
+                    if (mins < 1) {
+                        text.textContent = 'Active just now';
+                    } else if (mins < 60) {
+                        text.textContent = `Active ${mins} min${mins > 1 ? 's' : ''} ago`;
+                    } else {
+                        const hours = Math.floor(mins / 60);
+                        text.textContent = `Active ${hours} hour${hours > 1 ? 's' : ''} ago`;
+                    }
+                } else {
+                    dot.style.background = '#bbb';
+                    text.textContent = 'Agent is offline';
+                }
+            }
+            return;
+        }
+        if (data.sender_id != userId) {
+            const container = document.getElementById('messages-container');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message-item received';
+            msgDiv.style = 'display: flex; align-items: flex-end; margin-bottom: 16px; justify-content: flex-start;';
+            msgDiv.innerHTML = `
+                <div class=\"message-bubble\" style=\"max-width: 60vw; padding: 12px 18px; border-radius: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); background: #f5f5f5; color: #222; margin-right: 40px;\">
+                    <div class=\"message-header\" style=\"display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;\">
+                        <span class=\"message-sender\" style=\"font-weight: 600; font-size: 0.95em;\">${data.sender}</span>
+                        <span class=\"message-time\" style=\"font-size: 0.8em; color: #888; margin-left: 10px;\">${data.timestamp}</span>
+                    </div>
+                    <div class=\"message-text\" style=\"white-space: pre-line; word-break: break-word; font-size: 1em;\">${data.message}</div>
+                </div>
+            `;
+            container.appendChild(msgDiv);
+            scrollToBottom();
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+        // Optionally, implement reconnection logic here
+    };
+
+    setInterval(function() {
+        if (chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({type: 'ping'}));
+        }
+    }, 30000);
+});
+</script>
+{% endblock %}

@@ -2,5 +2,5 @@
         hx-post="{% url 'properties:toggle_favorite' property.id %}"
         hx-target="this"
         hx-swap="outerHTML">
-    <i class="{% if is_favorited %}icon-heart-filled{% else %}icon-heart{% endif %}"></i>
+    <i class="{% if is_favorited %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
 </button>

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Favorites | Realtor{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/favorites.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="favorites-root">
+  <div class="favorites-header">
+    <h1>My Favorite Properties</h1>
+  </div>
+  {% if page_obj and page_obj.object_list %}
+  <div class="favorites-grid">
+    {% for fav in page_obj.object_list %}
+    <div class="favorite-card" data-favorite-id="{{ fav.id }}">
+      <a href="{{ fav.property.get_absolute_url }}" class="favorite-image-link">
+        {% if fav.property.images.first %}
+          <img src="{{ fav.property.images.first.image.url }}" alt="{{ fav.property.title }}">
+        {% else %}
+          <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ fav.property.title }}">
+        {% endif %}
+      </a>
+      <div class="favorite-info">
+        <div class="favorite-title"><a href="{{ fav.property.get_absolute_url }}">{{ fav.property.title }}</a></div>
+        <div class="favorite-location">{{ fav.property.location.name }}, {{ fav.property.location.state }}</div>
+        <div class="favorite-price">${{ fav.property.price|floatformat:0 }}</div>
+        <button class="remove-favorite-btn" data-favorite-id="{{ fav.id }}" data-property-id="{{ fav.property.id }}">
+          <i class="fas fa-trash"></i> Remove
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="favorites-pagination">
+    {% if page_obj.has_other_pages %}
+      <nav class="pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="page-link">&laquo; Prev</a>
+        {% endif %}
+        <span class="page-link current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next &raquo;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="favorites-empty">
+    <i class="fas fa-heart-broken"></i>
+    <h3>No favorites yet</h3>
+    <p>Browse properties and add your favorites here.</p>
+    <a href="{% url 'properties:list' %}" class="btn btn-primary">Browse Properties</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/favorites.js' %}"></script>
+{% endblock %} 

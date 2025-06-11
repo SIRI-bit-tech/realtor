@@ -96,9 +96,29 @@ function initMobileMenu() {
   const navMenu = document.getElementById("nav-menu")
 
   if (navToggle && navMenu) {
-    navToggle.addEventListener("click", () => {
+    // Fix: Properly toggle mobile menu
+    navToggle.addEventListener("click", (e) => {
+      e.preventDefault()
+      e.stopPropagation()
       navToggle.classList.toggle("active")
       navMenu.classList.toggle("show")
+
+      // Add visible class to ensure it displays
+      if (navMenu.classList.contains("show")) {
+        navMenu.style.display = "block"
+        // Animate in
+        setTimeout(() => {
+          navMenu.style.transform = "translateY(0)"
+          navMenu.style.opacity = "1"
+        }, 10)
+      } else {
+        // Animate out
+        navMenu.style.transform = "translateY(-10px)"
+        navMenu.style.opacity = "0"
+        setTimeout(() => {
+          navMenu.style.display = "none"
+        }, 300)
+      }
     })
 
     // Close menu when clicking on links
@@ -106,7 +126,25 @@ function initMobileMenu() {
       link.addEventListener("click", () => {
         navToggle.classList.remove("active")
         navMenu.classList.remove("show")
+        navMenu.style.transform = "translateY(-10px)"
+        navMenu.style.opacity = "0"
+        setTimeout(() => {
+          navMenu.style.display = "none"
+        }, 300)
       })
+    })
+
+    // Close when clicking outside
+    document.addEventListener("click", (e) => {
+      if (navMenu.classList.contains("show") && !navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+        navToggle.classList.remove("active")
+        navMenu.classList.remove("show")
+        navMenu.style.transform = "translateY(-10px)"
+        navMenu.style.opacity = "0"
+        setTimeout(() => {
+          navMenu.style.display = "none"
+        }, 300)
+      }
     })
   }
 }
@@ -140,6 +178,27 @@ function configureHTMX() {
       showNotification("Action completed successfully!", "success")
     }
   })
+
+  // HTMX global CSRF handler for Django
+  // Ensures all HTMX POST requests include the CSRF token
+
+  document.body.addEventListener('htmx:configRequest', function(event) {
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    event.detail.headers['X-CSRFToken'] = getCookie('csrftoken');
+  });
 }
 
 // Utility functions

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - {{ user.get_full_name|default:user.username }} | Realtor{% endblock %}
+{% block title %}Dashboard | Realtor{% endblock %}
 
 {% block content %}
 <div class="dashboard-page">
@@ -17,28 +17,30 @@
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="icon-heart"></i>
+                            <i class="fas fa-heart"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-number">{{ stats.favorites_count }}</span>
+                            <span class="stat-number" data-stat="favorites">{{ favorites_count }}</span>
                             <span class="stat-label">Favorites</span>
                         </div>
                     </div>
+                    
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="icon-eye"></i>
+                            <i class="fas fa-eye"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-number">{{ stats.views_count }}</span>
+                            <span class="stat-number" data-stat="views">{{ recent_views|length }}</span>
                             <span class="stat-label">Recent Views</span>
                         </div>
                     </div>
+                    
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="icon-search"></i>
+                            <i class="fas fa-bookmark"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-number">{{ stats.saved_searches_count }}</span>
+                            <span class="stat-number" data-stat="searches">{{ saved_searches|length }}</span>
                             <span class="stat-label">Saved Searches</span>
                         </div>
                     </div>
@@ -53,6 +55,42 @@
             <div class="dashboard-grid">
                 <!-- Main Content -->
                 <div class="dashboard-main">
+                    <!-- Recent Activity -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2>Recent Property Views</h2>
+                        </div>
+                        <div class="card-content">
+                            {% if recent_views %}
+                                <div class="recent-properties">
+                                    {% for view in recent_views %}
+                                        <div class="property-item">
+                                            <div class="property-image">
+                                                {% if view.property.images.first %}
+                                                    <img src="{{ view.property.images.first.image.url }}" alt="{{ view.property.title }}">
+                                                {% else %}
+                                                    <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ view.property.title }}">
+                                                {% endif %}
+                                            </div>
+                                            <div class="property-details">
+                                                <h4><a href="{{ view.property.get_absolute_url }}">{{ view.property.title }}</a></h4>
+                                                <p class="property-price">${{ view.property.price|floatformat:0 }}</p>
+                                                <p class="property-location">{{ view.property.location }}</p>
+                                                <p class="view-date">Viewed {{ view.timestamp|timesince }} ago</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-eye"></i>
+                                    <p>No recent property views</p>
+                                    <a href="{% url 'properties:list' %}" class="btn btn-primary">Browse Properties</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
                     <!-- Favorite Properties -->
                     <div class="dashboard-card">
                         <div class="card-header">
@@ -87,48 +125,10 @@
                                 </div>
                             {% else %}
                                 <div class="empty-state">
-                                    <i class="icon-heart"></i>
+                                    <i class="fas fa-heart"></i>
                                     <h3>No Favorite Properties</h3>
                                     <p>Start browsing properties and add them to your favorites</p>
                                     <a href="{% url 'properties:list' %}" class="btn btn-primary">Browse Properties</a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Recent Views -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h2>Recently Viewed</h2>
-                        </div>
-                        <div class="card-content">
-                            {% if recent_views %}
-                                <div class="recent-views-list">
-                                    {% for view in recent_views %}
-                                        <div class="recent-view-item">
-                                            <div class="view-image">
-                                                {% if view.property.images.first %}
-                                                    <img src="{{ view.property.images.first.image.url }}" alt="{{ view.property.title }}">
-                                                {% else %}
-                                                    <img src="{% static 'images/property-placeholder.jpg' %}" alt="{{ view.property.title }}">
-                                                {% endif %}
-                                            </div>
-                                            <div class="view-content">
-                                                <h4 class="view-title">
-                                                    <a href="{{ view.property.get_absolute_url }}">{{ view.property.title }}</a>
-                                                </h4>
-                                                <div class="view-price">${{ view.property.price|floatformat:0 }}</div>
-                                                <div class="view-location">{{ view.property.location.name }}</div>
-                                                <div class="view-date">Viewed {{ view.created_at|timesince }} ago</div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="empty-state">
-                                    <i class="icon-eye"></i>
-                                    <h3>No Recent Views</h3>
-                                    <p>Properties you view will appear here</p>
                                 </div>
                             {% endif %}
                         </div>
@@ -137,33 +137,6 @@
 
                 <!-- Sidebar -->
                 <div class="dashboard-sidebar">
-                    <!-- Quick Actions -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3>Quick Actions</h3>
-                        </div>
-                        <div class="card-content">
-                            <div class="quick-actions">
-                                <a href="{% url 'properties:list' %}" class="action-btn">
-                                    <i class="icon-search"></i>
-                                    <span>Search Properties</span>
-                                </a>
-                                <a href="{% url 'users:favorites' %}" class="action-btn">
-                                    <i class="icon-heart"></i>
-                                    <span>View Favorites</span>
-                                </a>
-                                <a href="{% url 'users:saved_searches' %}" class="action-btn">
-                                    <i class="icon-bookmark"></i>
-                                    <span>Saved Searches</span>
-                                </a>
-                                <a href="{% url 'users:edit_profile' %}" class="action-btn">
-                                    <i class="icon-settings"></i>
-                                    <span>Edit Profile</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Profile Summary -->
                     <div class="dashboard-card">
                         <div class="card-header">
@@ -181,17 +154,32 @@
                                 <div class="profile-info">
                                     <h4>{{ user.get_full_name|default:user.username }}</h4>
                                     <p>{{ user.email }}</p>
-                                    {% if user.phone %}
-                                        <p>{{ user.phone }}</p>
-                                    {% endif %}
-                                    <div class="profile-status">
-                                        {% if user.is_verified %}
-                                            <span class="status-badge verified">Verified</span>
-                                        {% else %}
-                                            <span class="status-badge unverified">Unverified</span>
-                                        {% endif %}
-                                    </div>
+                                    <p>Member since {{ user.date_joined|date:"M Y" }}</p>
                                 </div>
+                            </div>
+                            <a href="{% url 'users:edit_profile' %}" class="btn btn-outline btn-block">Edit Profile</a>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Messages</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="messages-summary">
+                                <div class="message-stat">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>
+                                        {% if unread_messages_count > 0 %}
+                                            <span class="badge badge-danger" style="margin-right: 6px;">{{ unread_messages_count }}</span>
+                                            <strong>{{ unread_messages_count }} unread message{{ unread_messages_count|pluralize }}</strong>
+                                        {% else %}
+                                            0 unread messages
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <a href="{% url 'messaging:conversation_list' %}" class="btn btn-primary btn-block">View Messages</a>
                             </div>
                         </div>
                     </div>
@@ -202,21 +190,22 @@
                             <h3>Account Settings</h3>
                         </div>
                         <div class="card-content">
-                            <div class="settings-list">
-                                <a href="{% url 'users:edit_profile' %}" class="setting-item">
-                                    <i class="icon-user"></i>
-                                    <span>Edit Profile</span>
-                                    <i class="icon-chevron-right"></i>
+                            <div class="settings-menu">
+                                <a href="{% url 'users:edit_profile' %}" class="settings-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>Personal Information</span>
                                 </a>
-                                <a href="{% url 'accounts:password_reset' %}" class="setting-item">
-                                    <i class="icon-lock"></i>
+                                <a href="{% url 'accounts:change_password' %}" class="settings-item">
+                                    <i class="fas fa-lock"></i>
                                     <span>Change Password</span>
-                                    <i class="icon-chevron-right"></i>
                                 </a>
-                                <a href="{% url 'users:edit_profile' %}" class="setting-item">
-                                    <i class="icon-email"></i>
-                                    <span>Email Settings</span>
-                                    <i class="icon-chevron-right"></i>
+                                <a href="{% url 'users:saved_searches' %}" class="settings-item">
+                                    <i class="fas fa-search"></i>
+                                    <span>Saved Searches</span>
+                                </a>
+                                <a href="{% url 'accounts:logout' %}" class="settings-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
                                 </a>
                             </div>
                         </div>

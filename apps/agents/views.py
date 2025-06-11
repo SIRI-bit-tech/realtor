@@ -92,7 +92,7 @@ def agent_detail(request, username):
     )
 
     # Get agent's recent listings
-    recent_listings = agent.listings.filter(
+    recent_listings = agent.user.listings.filter(
         status='available'
     ).select_related('location', 'property_type').prefetch_related('images')[:6]
 

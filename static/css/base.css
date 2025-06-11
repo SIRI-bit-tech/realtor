@@ -504,6 +504,26 @@ a:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Map Container */
+.map-container {
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 200px;
+  border: none;
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-fast);
+}
+
+.map-container:hover iframe {
+  transform: scale(1.02);
+}
+
 .social-links {
   display: flex;
   gap: var(--spacing-md);

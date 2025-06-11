@@ -328,20 +328,52 @@
 
 /* Agent Detail Page */
 .agent-detail-page {
-  padding-top: 0;
+  max-width: 1200px;
+  margin: 48px auto;
+  padding: 0 16px;
 }
 
+/* Fix agent header positioning */
 .agent-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0a3d3a 100%);
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(41,121,255,0.08);
+  padding: 32px 32px 24px 32px;
+  margin-bottom: 32px;
+}
+
+/* Agent Detail Page Social Media */
+.agent-social-media {
+  margin-top: 18px;
+  display: flex;
+  gap: 16px;
+}
+
+.agent-social-media .social-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  font-size: 1.2rem;
+  backdrop-filter: blur(10px);
+}
+
+.agent-social-media .social-btn:hover {
+  background: var(--accent-color);
   color: white;
-  padding: var(--spacing-3xl) 0;
+  transform: scale(1.1);
 }
 
 .agent-header-content {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: var(--spacing-xl);
-  align-items: center;
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
 }
 
 .agent-avatar-large {
@@ -361,13 +393,18 @@
 .avatar-placeholder-large {
   width: 100%;
   height: 100%;
-  background: var(--accent-gradient);
+  background: #e3eafc;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3rem;
-  font-weight: 700;
-  color: white;
+  font-weight: bold;
+  color: #2979ff;
+}
+
+.agent-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .agent-info h1 {
@@ -389,59 +426,55 @@
 
 .agent-contact-info {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 10px;
 }
 
 .contact-item {
+  color: #2979ff;
+  text-decoration: none;
+  font-size: 1em;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  transition: color var(--transition-fast);
-}
-
-.contact-item:hover {
-  color: var(--accent-color);
+  gap: 6px;
 }
 
 .agent-stats-summary {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 32px;
+  margin-top: 18px;
 }
 
-.agent-stats-summary .stat-item {
+.stat-item {
+  background: #f7f9fa;
+  border-radius: 10px;
+  padding: 16px 18px;
   text-align: center;
-  padding: var(--spacing-lg);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(10px);
+  min-width: 110px;
 }
 
-.agent-stats-summary .stat-number {
-  display: block;
-  font-size: 2rem;
+.stat-number {
+  color: #2979ff;
+  font-size: 1.3em;
   font-weight: 700;
-  color: var(--accent-color);
-  margin-bottom: var(--spacing-xs);
+  display: block;
 }
 
-.agent-stats-summary .stat-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
+.stat-label {
+  color: #888;
+  font-size: 1em;
 }
 
 /* Agent Details Section */
 .agent-details-section {
-  padding: var(--spacing-3xl) 0;
+  margin-top: 32px;
 }
 
 .agent-details-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: var(--spacing-3xl);
+  gap: 32px;
 }
 
 .agent-main-content {
@@ -475,40 +508,38 @@
 }
 
 .specializations-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .specialization-item {
+  background: #e3eafc;
+  color: #2979ff;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 1em;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  background: var(--secondary-color);
-  border-radius: var(--radius-lg);
-}
-
-.specialization-item i {
-  color: var(--accent-color);
-  font-size: 1.1rem;
+  gap: 6px;
 }
 
 .listings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
 }
 
 .listing-card {
-  background: var(--secondary-color);
-  border-radius: var(--radius-lg);
+  background: #f7f9fa;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(41,121,255,0.04);
   overflow: hidden;
-  transition: transform var(--transition-normal);
+  transition: box-shadow 0.18s;
 }
 
 .listing-card:hover {
-  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(41,121,255,0.13);
 }
 
 .listing-image {
@@ -518,8 +549,9 @@
 
 .listing-image img {
   width: 100%;
-  height: 100%;
+  height: 120px;
   object-fit: cover;
+  display: block;
 }
 
 .listing-content {
@@ -530,7 +562,7 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary-color);
-  margin-bottom: var(--spacing-xs);
+  margin: 10px 0 2px 0;
 }
 
 .listing-title {
@@ -539,7 +571,9 @@
 }
 
 .listing-title a {
-  color: var(--neutral-color);
+  color: #2979ff;
+  font-weight: 600;
+  font-size: 1.08em;
   text-decoration: none;
 }
 
@@ -548,10 +582,9 @@
 }
 
 .listing-features {
-  display: flex;
-  gap: var(--spacing-sm);
-  font-size: 0.8rem;
-  color: #666;
+  color: #1a3c4c;
+  font-size: 0.98em;
+  margin-bottom: 10px;
 }
 
 /* Rating Distribution */
@@ -659,17 +692,20 @@
 .contact-card,
 .agency-card,
 .professional-card {
-  background: white;
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-md);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(41,121,255,0.06);
+  padding: 22px 18px 16px 18px;
+  margin-bottom: 22px;
 }
 
 .contact-card h3,
 .agency-card h3,
 .professional-card h3 {
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-lg);
+  color: #2979ff;
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-bottom: 12px;
 }
 
 .contact-form {
@@ -684,154 +720,117 @@
 }
 
 .form-control {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid #ddd;
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  transition: border-color var(--transition-fast);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(13, 79, 76, 0.1);
-}
-
-.btn-block {
   width: 100%;
-  justify-content: center;
+  padding: 8px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 7px;
+  font-size: 1em;
+  background: #f7f9fa;
+  color: #222;
+}
+
+.btn.btn-primary, .btn.btn-outline {
+  background: #2979ff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.btn.btn-primary:hover, .btn.btn-outline:hover {
+  background: #1565c0;
+}
+
+.btn.btn-outline {
+  background: #fff;
+  color: #2979ff;
+  border: 2px solid #2979ff;
+}
+
+.btn.btn-outline:hover {
+  background: #2979ff;
+  color: #fff;
 }
 
 .agency-logo {
-  max-width: 150px;
-  height: auto;
-  margin-bottom: var(--spacing-md);
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
 .agency-card h4 {
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-md);
+  color: #1a3c4c;
+  font-size: 1.1em;
+  margin-bottom: 6px;
 }
 
-.agency-contact p {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-  color: #666;
-}
-
-.agency-contact a {
-  color: var(--primary-color);
+.agency-contact p, .agency-contact a {
+  color: #2979ff;
+  font-size: 1em;
+  margin-bottom: 2px;
   text-decoration: none;
 }
 
 .details-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  margin-top: 8px;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  background: var(--secondary-color);
-  border-radius: var(--radius-md);
+  margin-bottom: 6px;
 }
 
 .detail-label {
-  font-weight: 600;
-  color: var(--neutral-color);
+  color: #888;
+  font-size: 1em;
 }
 
 .detail-value {
-  color: #666;
+  color: #2979ff;
+  font-weight: 600;
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
+@media (max-width: 1000px) {
+  .agent-header-content, .agent-details-grid {
+    flex-direction: column;
+    display: block;
+  }
   .agent-details-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-xl);
+    gap: 18px;
   }
-
-  .agent-header-content {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
-    text-align: center;
-  }
-
-  .agent-stats-summary {
-    flex-direction: row;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .agents-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .filters-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .specializations-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .listings-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .agent-stats-summary {
-    flex-direction: column;
-  }
-
-  .rating-bar {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    align-items: stretch;
-  }
-
-  .rating-label {
-    min-width: auto;
-  }
-
-  .rating-count {
-    text-align: left;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-title {
-    font-size: 2rem;
-  }
-
-  .agent-info h1 {
-    font-size: 1.8rem;
-  }
-
   .agent-header {
-    padding: var(--spacing-xl) 0;
+    padding: 18px 6px;
   }
+}
 
-  .agent-details-section {
-    padding: var(--spacing-xl) 0;
+@media (max-width: 600px) {
+  .agent-detail-page {
+    padding: 0 2px;
+    margin: 0;
   }
-
-  .agent-avatar-large {
-    width: 100px;
-    height: 100px;
+  .agent-header, .agent-main-content > .agent-about-card, .agent-main-content > .agent-specializations-card, .agent-main-content > .agent-listings-card, .agent-sidebar > .contact-card, .agent-sidebar > .agency-card, .agent-sidebar > .professional-card {
+    border-radius: 0;
+    box-shadow: none;
+    padding: 12px 4px;
   }
-
-  .avatar-placeholder-large {
-    font-size: 2rem;
+  .agent-avatar-large img, .avatar-placeholder-large {
+    width: 70px;
+    height: 70px;
+    font-size: 1.2em;
   }
-
-  .agent-stats-summary .stat-number {
-    font-size: 1.5rem;
+  .agent-listings-card .listings-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 }

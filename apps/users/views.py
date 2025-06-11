@@ -8,6 +8,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from apps.properties.models import Property, PropertyFavorite
 from .models import UserProfile
+from apps.messaging.models import Conversation, Message
 
 User = get_user_model()
 
@@ -35,6 +36,12 @@ def dashboard(request):
         profile = UserProfile.objects.create(user=user)
         saved_searches_count = 0
     
+    # Unread messages count
+    unread_messages_count = Message.objects.filter(
+        Q(conversation__participants=user) & ~Q(sender=user),
+        is_read=False
+    ).count()
+    
     # Dashboard statistics
     stats = {
         'favorites_count': favorites.count(),
@@ -46,6 +53,7 @@ def dashboard(request):
         'favorites': favorites,
         'recent_views': recent_views,
         'stats': stats,
+        'unread_messages_count': unread_messages_count,
     }
     
     return render(request, 'users/dashboard.html', context)
@@ -54,28 +62,43 @@ def dashboard(request):
 def profile(request, username):
     """User profile page"""
     profile_user = get_object_or_404(User, username=username)
-    
-    # Check if viewing own profile
     is_own_profile = request.user == profile_user
-    
     context = {
         'profile_user': profile_user,
         'is_own_profile': is_own_profile,
     }
-    
-    # If it's an agent, show agent-specific information
-    if hasattr(profile_user, 'agent') and profile_user.agent:
-        agent = profile_user.agent
-        recent_listings = agent.listings.filter(
-            status='available'
-        ).select_related('location', 'property_type').prefetch_related('images')[:6]
-        
+    if is_own_profile:
+        # Get user's favorite properties
+        favorites = PropertyFavorite.objects.filter(user=profile_user).select_related(
+            'property__location', 'property__property_type'
+        ).prefetch_related('property__images')[:6]
+        # Get recent property views
+        recent_views = profile_user.property_views.select_related(
+            'property__location', 'property__property_type'
+        ).prefetch_related('property__images').order_by('-created_at')[:6]
+        # Get saved searches count
+        try:
+            profile = profile_user.profile
+            saved_searches_count = len(profile.saved_searches) if profile.saved_searches else 0
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.objects.create(user=profile_user)
+            saved_searches_count = 0
+        # Unread messages count
+        unread_messages_count = Message.objects.filter(
+            Q(conversation__participants=profile_user) & ~Q(sender=profile_user),
+            is_read=False
+        ).count()
+        stats = {
+            'favorites_count': favorites.count(),
+            'views_count': recent_views.count(),
+            'saved_searches_count': saved_searches_count,
+        }
         context.update({
-            'agent': agent,
-            'recent_listings': recent_listings,
+            'favorites': favorites,
+            'recent_views': recent_views,
+            'stats': stats,
+            'unread_messages_count': unread_messages_count,
         })
-        return render(request, 'users/agent_profile.html', context)
-    
     return render(request, 'users/profile.html', context)
 
 @login_required

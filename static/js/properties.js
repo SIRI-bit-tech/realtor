@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initPropertySearch()
   initViewTracking()
   initPropertyComparison()
+  initViewToggle()
 })
 
 // Property filtering with HTMX
@@ -493,3 +494,31 @@ function initPropertyComparison() {
 
 // Initialize comparison on page load
 document.addEventListener("DOMContentLoaded", initPropertyComparison)
+
+function initViewToggle() {
+  const viewBtns = document.querySelectorAll('.view-btn');
+  const grid = document.getElementById('properties-grid');
+  const map = document.getElementById('map-container');
+  const list = document.querySelector('.properties-list');
+
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      viewBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const view = this.getAttribute('data-view');
+      if (view === 'grid') {
+        if (grid) grid.style.display = '';
+        if (list) list.style.display = 'none';
+        if (map) map.style.display = 'none';
+      } else if (view === 'list') {
+        if (grid) grid.style.display = 'none';
+        if (list) list.style.display = '';
+        if (map) map.style.display = 'none';
+      } else if (view === 'map') {
+        if (grid) grid.style.display = 'none';
+        if (list) list.style.display = 'none';
+        if (map) map.style.display = '';
+      }
+    });
+  });
+}

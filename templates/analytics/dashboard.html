@@ -5,6 +5,37 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/analytics.css' %}">
+<style>
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  background: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.sort-asc::after {
+  content: ' ↑';
+}
+
+.sort-desc::after {
+  content: ' ↓';
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -23,7 +54,7 @@
                     </select>
                 </form>
                 <div class="dashboard-actions">
-                    <a href="{% url 'analytics:export' %}?type=pageviews&days={{ days }}" class="btn btn-outline">Export Data</a>
+                    <button data-export="pageviews" data-days="{{ days }}" class="btn btn-outline">Export Data</button>
                     <a href="{% url 'analytics:properties' %}" class="btn btn-primary">Property Analytics</a>
                 </div>
             </div>
@@ -32,30 +63,30 @@
         <div class="stats-overview">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="icon-eye"></i>
+                    <i class="fas fa-eye"></i>
                 </div>
                 <div class="stat-content">
-                    <h3 class="stat-value">{{ total_page_views }}</h3>
+                    <h3 class="stat-value" data-stat="total_page_views">{{ total_page_views }}</h3>
                     <p class="stat-label">Page Views</p>
                 </div>
             </div>
             
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="icon-home"></i>
+                    <i class="fas fa-home"></i>
                 </div>
                 <div class="stat-content">
-                    <h3 class="stat-value">{{ total_property_views }}</h3>
+                    <h3 class="stat-value" data-stat="total_property_views">{{ total_property_views }}</h3>
                     <p class="stat-label">Property Views</p>
                 </div>
             </div>
             
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="icon-search"></i>
+                    <i class="fas fa-search"></i>
                 </div>
                 <div class="stat-content">
-                    <h3 class="stat-value">{{ total_searches }}</h3>
+                    <h3 class="stat-value" data-stat="total_searches">{{ total_searches }}</h3>
                     <p class="stat-label">Searches</p>
                 </div>
             </div>
@@ -169,7 +200,7 @@
         const values = pageViewsData.map(item => item.count);
         
         const ctx = document.getElementById('pageViewsChart').getContext('2d');
-        new Chart(ctx, {
+        window.pageViewsChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,

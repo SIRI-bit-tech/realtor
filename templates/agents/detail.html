@@ -25,7 +25,7 @@
                     <div class="agent-rating">
                         <div class="stars">
                             {% for i in "12345" %}
-                                <i class="icon-star {% if agent.avg_rating >= forloop.counter %}filled{% endif %}"></i>
+                                <i class="fas fa-star {% if agent.avg_rating >= forloop.counter %}filled{% endif %}"></i>
                             {% endfor %}
                         </div>
                         <span class="rating-text">{{ agent.avg_rating|floatformat:1 }} ({{ agent.review_count }} reviews)</span>
@@ -34,17 +34,17 @@
                     <div class="agent-contact-info">
                         {% if agent.mobile_phone %}
                             <a href="tel:{{ agent.mobile_phone }}" class="contact-item">
-                                <i class="icon-phone"></i>
+                                <i class="fas fa-phone"></i>
                                 {{ agent.mobile_phone }}
                             </a>
                         {% endif %}
                         <a href="mailto:{{ agent.user.email }}" class="contact-item">
-                            <i class="icon-email"></i>
+                            <i class="fas fa-envelope"></i>
                             {{ agent.user.email }}
                         </a>
                         {% if agent.user.website %}
                             <a href="{{ agent.user.website }}" class="contact-item" target="_blank">
-                                <i class="icon-globe"></i>
+                                <i class="fas fa-globe"></i>
                                 Website
                             </a>
                         {% endif %}
@@ -66,10 +66,26 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Social Media Icons -->
+            <div class="agent-social-media">
+                <a href="#" class="social-btn" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-btn" title="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="social-btn" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-btn" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- Agent Details -->
+    <!-- Rest of the template remains the same -->
     <section class="agent-details-section">
         <div class="container">
             <div class="agent-details-grid">
@@ -92,7 +108,7 @@
                             <div class="specializations-grid">
                                 {% for spec in agent.specializations %}
                                     <div class="specialization-item">
-                                        <i class="icon-check"></i>
+                                        <i class="fas fa-check"></i>
                                         <span>{{ spec }}</span>
                                     </div>
                                 {% endfor %}
@@ -125,47 +141,6 @@
                                                 <span>{{ property.square_feet|floatformat:0 }} sq ft</span>
                                             </div>
                                         </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endif %}
-
-                    <!-- Reviews -->
-                    {% if reviews %}
-                        <div class="agent-reviews-card">
-                            <h2>Client Reviews</h2>
-                            
-                            <!-- Rating Distribution -->
-                            <div class="rating-distribution">
-                                {% for rating, count in rating_distribution.items %}
-                                    <div class="rating-bar">
-                                        <span class="rating-label">{{ rating }} star{{ rating|pluralize }}</span>
-                                        <div class="rating-progress">
-                                            <div class="rating-fill" style="width: {% widthratio count agent.review_count 100 %}%"></div>
-                                        </div>
-                                        <span class="rating-count">{{ count }}</span>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            
-                            <!-- Reviews List -->
-                            <div class="reviews-list">
-                                {% for review in reviews %}
-                                    <div class="review-item">
-                                        <div class="review-header">
-                                            <div class="reviewer-info">
-                                                <strong>{{ review.reviewer.get_full_name|default:review.reviewer.username }}</strong>
-                                                <div class="review-stars">
-                                                    {% for i in "12345" %}
-                                                        <i class="icon-star {% if review.rating >= forloop.counter %}filled{% endif %}"></i>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
-                                        </div>
-                                        <h4 class="review-title">{{ review.title }}</h4>
-                                        <p class="review-comment">{{ review.comment }}</p>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -204,10 +179,10 @@
                         {% endif %}
                         <h4>{{ agent.agency.name }}</h4>
                         <div class="agency-contact">
-                            <p><i class="icon-phone"></i> {{ agent.agency.phone }}</p>
-                            <p><i class="icon-email"></i> {{ agent.agency.email }}</p>
+                            <p><i class="fas fa-phone"></i> {{ agent.agency.phone }}</p>
+                            <p><i class="fas fa-envelope"></i> {{ agent.agency.email }}</p>
                             {% if agent.agency.website %}
-                                <p><i class="icon-globe"></i> <a href="{{ agent.agency.website }}" target="_blank">Website</a></p>
+                                <p><i class="fas fa-globe"></i> <a href="{{ agent.agency.website }}" target="_blank">Website</a></p>
                             {% endif %}
                         </div>
                         <a href="{{ agent.agency.get_absolute_url }}" class="btn btn-outline btn-block">View Agency</a>
@@ -239,7 +214,7 @@
     </section>
 </div>
 {% endblock %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/agents.css' %}">
 {% endblock %}
+

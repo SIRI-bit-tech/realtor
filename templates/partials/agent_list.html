@@ -13,10 +13,10 @@
                 <div class="agent-overlay">
                     <div class="agent-social">
                         <a href="mailto:{{ agent.user.email }}" class="social-btn">
-                            <i class="icon-email"></i>
+                            <i class="fas fa-envelope"></i>
                         </a>
                         <a href="tel:{{ agent.mobile_phone|default:agent.office_phone }}" class="social-btn">
-                            <i class="icon-phone"></i>
+                            <i class="fas fa-phone"></i>
                         </a>
                         {% if agent.user.website %}
                             <a href="{{ agent.user.website }}" class="social-btn" target="_blank">

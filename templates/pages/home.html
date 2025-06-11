@@ -71,7 +71,7 @@
                             </div>
                             
                             <button type="submit" class="btn btn-cta search-btn">
-                                <i class="icon-search"></i>
+                                <i class="fas fa-search"></i>
                                 Search Properties
                             </button>
                         </div>
@@ -102,7 +102,7 @@
         <div class="stats-grid">
             <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
                 <div class="stat-icon">
-                    <i class="icon-home"></i>
+                    <i class="fas fa-home"></i>
                 </div>
                 <div class="stat-number" data-count="{{ stats.total_properties }}">0</div>
                 <div class="stat-label">Properties Available</div>
@@ -110,7 +110,7 @@
             
             <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
                 <div class="stat-icon">
-                    <i class="icon-users"></i>
+                    <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-number" data-count="{{ stats.total_agents }}">0</div>
                 <div class="stat-label">Expert Agents</div>
@@ -118,7 +118,7 @@
             
             <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
                 <div class="stat-icon">
-                    <i class="icon-check"></i>
+                    <i class="fas fa-handshake"></i>
                 </div>
                 <div class="stat-number" data-count="{{ stats.total_sales }}">0</div>
                 <div class="stat-label">Successful Sales</div>
@@ -126,7 +126,7 @@
             
             <div class="stat-item" data-aos="fade-up" data-aos-delay="400">
                 <div class="stat-icon">
-                    <i class="icon-map"></i>
+                    <i class="fas fa-map-marker-alt"></i>
                 </div>
                 <div class="stat-number" data-count="{{ stats.total_locations }}">0</div>
                 <div class="stat-label">Cities Covered</div>
@@ -159,10 +159,10 @@
                                         hx-post="{% url 'properties:toggle_favorite' property.id %}"
                                         hx-target="this"
                                         hx-swap="outerHTML">
-                                    <i class="icon-heart"></i>
+                                    <i class="fas fa-heart"></i>
                                 </button>
                                 <a href="{{ property.get_absolute_url }}" class="action-btn view-btn">
-                                    <i class="icon-eye"></i>
+                                    <i class="fas fa-eye"></i>
                                 </a>
                             </div>
                         </div>
@@ -188,21 +188,21 @@
                         </h3>
                         
                         <div class="property-location">
-                            <i class="icon-location"></i>
+                            <i class="fas fa-map-marker-alt"></i>
                             {{ property.address }}, {{ property.location.name }}
                         </div>
                         
                         <div class="property-features">
                             <span class="feature">
-                                <i class="icon-bed"></i>
+                                <i class="fas fa-bed"></i>
                                 {{ property.bedrooms }} bed{{ property.bedrooms|pluralize }}
                             </span>
                             <span class="feature">
-                                <i class="icon-bath"></i>
+                                <i class="fas fa-bath"></i>
                                 {{ property.bathrooms }} bath{{ property.bathrooms|pluralize }}
                             </span>
                             <span class="feature">
-                                <i class="icon-area"></i>
+                                <i class="fas fa-ruler-combined"></i>
                                 {{ property.square_feet|floatformat:0 }} sq ft
                             </span>
                         </div>
@@ -242,7 +242,7 @@
         <div class="services-grid">
             <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="100">
                 <div class="service-icon">
-                    <i class="icon-home-search"></i>
+                    <i class="fas fa-search"></i>
                 </div>
                 <h3 class="service-title">Property Search</h3>
                 <p class="service-description">
@@ -258,7 +258,7 @@
             
             <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="service-icon">
-                    <i class="icon-handshake"></i>
+                    <i class="fas fa-handshake"></i>
                 </div>
                 <h3 class="service-title">Buying Assistance</h3>
                 <p class="service-description">
@@ -274,7 +274,7 @@
             
             <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="service-icon">
-                    <i class="icon-tag"></i>
+                    <i class="fas fa-tag"></i>
                 </div>
                 <h3 class="service-title">Selling Services</h3>
                 <p class="service-description">
@@ -290,7 +290,7 @@
             
             <div class="service-card glass-card" data-aos="fade-up" data-aos-delay="400">
                 <div class="service-icon">
-                    <i class="icon-calculator"></i>
+                    <i class="fas fa-chart-line"></i>
                 </div>
                 <h3 class="service-title">Investment Analysis</h3>
                 <p class="service-description">
@@ -328,14 +328,14 @@
                         <div class="agent-overlay">
                             <div class="agent-social">
                                 <a href="mailto:{{ agent.user.email }}" class="social-btn">
-                                    <i class="icon-email"></i>
+                                    <i class="fas fa-envelope"></i>
                                 </a>
                                 <a href="tel:{{ agent.mobile_phone }}" class="social-btn">
-                                    <i class="icon-phone"></i>
+                                    <i class="fas fa-phone"></i>
                                 </a>
                                 {% if agent.user.website %}
                                     <a href="{{ agent.user.website }}" class="social-btn" target="_blank">
-                                        <i class="icon-globe"></i>
+                                        <i class="fas fa-globe"></i>
                                     </a>
                                 {% endif %}
                             </div>
@@ -401,15 +401,15 @@
             
             <div class="cta-features">
                 <div class="cta-feature">
-                    <i class="icon-shield"></i>
+                    <i class="fas fa-shield-alt"></i>
                     <span>Trusted & Secure</span>
                 </div>
                 <div class="cta-feature">
-                    <i class="icon-support"></i>
+                    <i class="fas fa-headset"></i>
                     <span>24/7 Support</span>
                 </div>
                 <div class="cta-feature">
-                    <i class="icon-award"></i>
+                    <i class="fas fa-award"></i>
                     <span>Award Winning</span>
                 </div>
             </div>

@@ -1,7 +1,8 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponseBadRequest
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,14 +14,10 @@ urlpatterns = [
     path('search/', include('apps.search.urls', namespace='search')),
     path('messaging/', include('apps.messaging.urls', namespace='messaging')),
     path('analytics/', include('apps.analytics.urls', namespace='analytics')),  # Add this line
+    # Catch HTTP requests to WebSocket endpoints and return 400
+    re_path(r'^ws/messaging/.*$', lambda request: HttpResponseBadRequest('WebSocket endpoint: use a WebSocket connection, not HTTP.')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-    if 'debug_toolbar' in settings.INSTALLED_APPS:
-        import debug_toolbar
-        urlpatterns = [
-            path('__debug__/', include(debug_toolbar.urls)),
-        ] + urlpatterns

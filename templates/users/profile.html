@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile | Realtor{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-main-grid">
+  <aside class="profile-sidebar">
+    <div class="profile-card">
+      <div class="profile-avatar-lg">
+        {% if profile_user.avatar %}
+          <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.get_full_name }}">
+        {% else %}
+          <div class="avatar-placeholder-lg">{{ profile_user.first_name|first }}{{ profile_user.last_name|first }}</div>
+        {% endif %}
+      </div>
+      <h1 class="profile-name-lg">{{ profile_user.get_full_name|default:profile_user.username }} {% if profile_user.is_verified %}<span class="verified-badge" title="Verified">✔</span>{% endif %}</h1>
+      <div class="profile-type-lg">{{ profile_user.get_user_type_display }}</div>
+      <div class="profile-contact-lg">
+        <div><span>{{ profile_user.email }}</span></div>
+        {% if profile_user.phone %}<div><span>{{ profile_user.phone }}</span></div>{% endif %}
+        {% if profile_user.location %}<div><span>{{ profile_user.location }}</span></div>{% endif %}
+        {% if profile_user.website %}<div><a href="{{ profile_user.website }}" target="_blank">{{ profile_user.website }}</a></div>{% endif %}
+        {% if profile_user.profile.preferred_contact %}<div><span>Preferred: {{ profile_user.profile.preferred_contact|title }}</span></div>{% endif %}
+      </div>
+      {% if profile_user.bio %}
+      <div class="profile-bio-lg">{{ profile_user.bio }}</div>
+      {% endif %}
+      <div class="profile-stats-lg">
+        <div><span class="stat-label">Favorites</span><span class="stat-value">{{ stats.favorites_count|default:0 }}</span></div>
+        <div><span class="stat-label">Views</span><span class="stat-value">{{ stats.views_count|default:0 }}</span></div>
+        <div><span class="stat-label">Saved Searches</span><span class="stat-value">{{ stats.saved_searches_count|default:0 }}</span></div>
+      </div>
+      {% if is_own_profile %}
+      <a href="{% url 'users:edit_profile' %}" class="btn btn-primary profile-edit-btn-lg">Edit Profile</a>
+      {% endif %}
+    </div>
+  </aside>
+  <section class="profile-content-grid">
+    {% if favorites %}
+    <div class="profile-section-card">
+      <h2>Recent Favorites</h2>
+      <div class="profile-properties-grid">
+        {% for fav in favorites %}
+        <div class="property-card">
+          <a href="{{ fav.property.get_absolute_url }}">
+            {% if fav.property.images.all %}
+              <img src="{{ fav.property.images.all.0.image.url }}" alt="{{ fav.property.title }}">
+            {% endif %}
+            <div class="property-title">{{ fav.property.title }}</div>
+            <div class="property-meta">{{ fav.property.location.name }}, {{ fav.property.location.state }}</div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if recent_views %}
+    <div class="profile-section-card">
+      <h2>Recently Viewed</h2>
+      <div class="profile-properties-grid">
+        {% for view in recent_views %}
+        <div class="property-card">
+          <a href="{{ view.property.get_absolute_url }}">
+            {% if view.property.images.all %}
+              <img src="{{ view.property.images.all.0.image.url }}" alt="{{ view.property.title }}">
+            {% endif %}
+            <div class="property-title">{{ view.property.title }}</div>
+            <div class="property-meta">{{ view.property.location.name }}, {{ view.property.location.state }}</div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if is_own_profile and stats.saved_searches_count > 0 %}
+    <div class="profile-section-card">
+      <h2>Saved Searches</h2>
+      <ul class="profile-saved-searches-list">
+        {% for search in profile_user.profile.saved_searches|slice:":3" %}
+        <li>{{ search.name|default:"Untitled" }}</li>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'users:saved_searches' %}" class="profile-link">View all</a>
+    </div>
+    {% endif %}
+    {% if is_own_profile %}
+    <div class="profile-section-card">
+      <h2>Recent Conversations</h2>
+      <div id="profile-conversations">
+        <!-- Optionally include a partial for recent conversations/messages -->
+      </div>
+      <a href="{% url 'messaging:conversation_list' %}" class="profile-link">Go to Inbox</a>
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %} 

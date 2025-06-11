@@ -25,12 +25,12 @@ def analytics_dashboard(request):
     total_property_views = PropertyView.objects.filter(timestamp__gte=start_date).count()
     total_searches = SearchQuery.objects.filter(timestamp__gte=start_date).count()
     
-    # Most viewed properties
+    # Most viewed properties - using a different annotation name
     most_viewed_properties = Property.objects.filter(
-        views__timestamp__gte=start_date
+        analytics_views__timestamp__gte=start_date
     ).annotate(
-        view_count=Count('views')
-    ).order_by('-view_count')[:10]
+        analytics_view_count=Count('analytics_views')
+    ).order_by('-analytics_view_count')[:10]
     
     # Most searched terms
     most_searched_terms = SearchQuery.objects.filter(
@@ -84,7 +84,7 @@ def property_analytics(request):
         try:
             property = Property.objects.get(id=property_id)
             
-            # Get view statistics
+            # Get view statistics - using the correct related name
             views = PropertyView.objects.filter(
                 property=property,
                 timestamp__gte=start_date
@@ -119,8 +119,8 @@ def property_analytics(request):
     
     # If no property ID or invalid ID, show list of properties with analytics
     properties = Property.objects.annotate(
-        view_count=Count('views', filter=Q(views__timestamp__gte=start_date))
-    ).order_by('-view_count')
+        analytics_view_count=Count('analytics_views', filter=Q(analytics_views__timestamp__gte=start_date))
+    ).order_by('-analytics_view_count')
     
     context = {
         'properties': properties,

@@ -1,128 +1,192 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
-from django.db.models import Q, Count
-from django.views.decorators.http import require_http_methods
+from django.db.models import Q, Count, Max
+from django.core.paginator import Paginator
 from .models import Conversation, Message
 from apps.properties.models import Property
-
-User = get_user_model()
-
+from apps.users.models import User
 
 @login_required
 def conversation_list(request):
-    """List user's conversations"""
+    """Display list of user's conversations"""
     conversations = Conversation.objects.filter(
         participants=request.user
     ).annotate(
-        message_count=Count('messages'),
-        unread_count=Count('messages', filter=Q(messages__is_read=False, messages__sender__ne=request.user))
-    ).prefetch_related('participants', 'messages')
-
+        last_message_time=Max('messages__created_at'),
+        unread_count=Count(
+            'messages',
+            filter=~Q(messages__sender=request.user) & Q(messages__is_read=False)
+        )
+    ).order_by('-last_message_time')
+    
+    # Add other_user and last_message to each conversation
+    for conversation in conversations:
+        conversation.other_user = conversation.get_other_participant(request.user)
+        conversation.last_message = conversation.messages.order_by('-created_at').first()
+    
+    # Calculate total unread count
+    unread_count = sum(conv.unread_count for conv in conversations)
+    
     context = {
         'conversations': conversations,
+        'unread_count': unread_count,
     }
-
     return render(request, 'messaging/conversation_list.html', context)
 
-
 @login_required
-def conversation_detail(request, pk):
-    """View conversation messages"""
+def conversation_detail(request, conversation_id):
+    """Display conversation detail with messages"""
     conversation = get_object_or_404(
-        Conversation.objects.prefetch_related('messages__sender', 'participants'),
-        pk=pk,
-        participants=request.user
+        Conversation.objects.filter(
+            participants=request.user
+        ),
+        id=conversation_id
     )
-
+    # Get messages for this conversation
+    messages_list = conversation.messages.select_related('sender').order_by('created_at')
+    
     # Mark messages as read
-    conversation.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
-
-    if request.method == 'POST':
-        content = request.POST.get('content', '').strip()
-        if content:
-            Message.objects.create(
-                conversation=conversation,
-                sender=request.user,
-                content=content
-            )
-
-            if request.htmx:
-                # Return the new message for HTMX
-                message = conversation.messages.last()
-                return render(request, 'partials/message_item.html', {
-                    'message': message,
-                    'user': request.user
-                })
-
-            return redirect('messaging:conversation_detail', pk=conversation.pk)
-
+    conversation.messages.filter(
+        ~Q(sender=request.user),
+        is_read=False
+    ).update(is_read=True)
+    
+    # Determine other user
+    conversation.other_user = conversation.get_other_participant(request.user)
+    
     context = {
         'conversation': conversation,
-        'other_participant': conversation.get_other_participant(request.user),
+        'messages': messages_list,
     }
-
     return render(request, 'messaging/conversation_detail.html', context)
 
-
 @login_required
-@require_http_methods(["POST"])
-def start_conversation(request):
-    """Start a new conversation"""
-    recipient_id = request.POST.get('recipient_id')
-    property_id = request.POST.get('property_id')
-    subject = request.POST.get('subject', 'Property Inquiry')
-    content = request.POST.get('content', '').strip()
-
-    if not recipient_id or not content:
-        messages.error(request, 'Recipient and message content are required.')
-        return redirect('core:home')
-
-    try:
-        recipient = User.objects.get(id=recipient_id)
-        property_obj = None
-
-        if property_id:
-            property_obj = Property.objects.get(id=property_id)
-            subject = f"Inquiry about {property_obj.title}"
-
-        # Check if conversation already exists
-        existing_conversation = Conversation.objects.filter(
-            participants=request.user
-        ).filter(
-            participants=recipient
-        ).filter(
-            property=property_obj
-        ).first()
-
-        if existing_conversation:
-            # Add message to existing conversation
-            Message.objects.create(
-                conversation=existing_conversation,
-                sender=request.user,
-                content=content
+def send_message(request, conversation_id):
+    """Send a message in a conversation"""
+    if request.method == 'POST':
+        conversation = get_object_or_404(
+            Conversation.objects.filter(
+                id=conversation_id, participants=request.user
             )
-            conversation = existing_conversation
-        else:
-            # Create new conversation
-            conversation = Conversation.objects.create(
-                subject=subject,
-                property=property_obj
-            )
-            conversation.participants.add(request.user, recipient)
-
-            # Add first message
-            Message.objects.create(
+        )
+        content = request.POST.get('content', '').strip()
+        if content:
+            message = Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
                 content=content
             )
+            
+            # Update conversation timestamp
+            conversation.save()  # This will update the updated_at field
+            
+            if request.headers.get('HX-Request'):
+                # Return the message HTML for HTMX
+                return render(request, 'partials/message_item.html', {'message': message})
+            else:
+                messages.success(request, 'Message sent successfully!')
+        else:
+            if request.headers.get('HX-Request'):
+                return HttpResponse('<div class="alert alert-error">Message cannot be empty</div>')
+            else:
+                messages.error(request, 'Message cannot be empty')
+    
+    return redirect('messaging:conversation_detail', conversation_id=conversation_id)
 
-        messages.success(request, 'Message sent successfully!')
-        return redirect('messaging:conversation_detail', pk=conversation.pk)
+@login_required
+def start_conversation(request):
+    """Start a new conversation"""
+    if request.method == 'POST':
+        recipient_id = request.POST.get('recipient_id')
+        property_id = request.POST.get('property_id')
+        initial_message = request.POST.get('message', '').strip()
+        
+        if not recipient_id or not initial_message:
+            if request.headers.get('HX-Request'):
+                return HttpResponse('<div class="alert alert-error">Recipient and message are required</div>')
+            messages.error(request, 'Recipient and message are required')
+            return redirect('messaging:conversation_list')
+        
+        try:
+            recipient = User.objects.get(id=recipient_id)
+            property_obj = None
+            
+            if property_id:
+                property_obj = Property.objects.get(id=property_id)
+            
+            # Check if conversation already exists
+            existing_conversation = Conversation.objects.filter(
+                property=property_obj
+            ).filter(
+                participants=request.user
+            ).filter(
+                participants=recipient
+            ).first()
+            
+            if existing_conversation:
+                conversation = existing_conversation
+            else:
+                # Create new conversation
+                conversation = Conversation.objects.create(
+                    subject=f"Conversation with {recipient.username}",
+                    property=property_obj
+                )
+                conversation.participants.add(request.user, recipient)
+            
+            # Send initial message
+            Message.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                content=initial_message
+            )
+            
+            if request.headers.get('HX-Request'):
+                # Render the conversation detail partial for real-time swap
+                messages_list = conversation.messages.select_related('sender').order_by('created_at')
+                conversation.other_user = conversation.get_other_participant(request.user)
+                context = {
+                    'conversation': conversation,
+                    'messages': messages_list,
+                }
+                return render(request, 'messaging/conversation_detail.html', context)
+            else:
+                messages.success(request, 'Message sent successfully!')
+                return redirect('messaging:conversation_detail', conversation_id=conversation.id)
+            
+        except User.DoesNotExist:
+            if request.headers.get('HX-Request'):
+                return HttpResponse('<div class="alert alert-error">Recipient not found</div>')
+            messages.error(request, 'Recipient not found')
+        except Property.DoesNotExist:
+            if request.headers.get('HX-Request'):
+                return HttpResponse('<div class="alert alert-error">Property not found</div>')
+            messages.error(request, 'Property not found')
+        except Exception as e:
+            if request.headers.get('HX-Request'):
+                return HttpResponse('<div class="alert alert-error">An error occurred while sending the message</div>')
+            messages.error(request, 'An error occurred while sending the message')
+    
+    return redirect('messaging:conversation_list')
 
-    except (User.DoesNotExist, Property.DoesNotExist):
-        messages.error(request, 'Invalid recipient or property.')
-        return redirect('core:home')
-
+@login_required
+def mark_conversation_read(request, conversation_id):
+    """Mark all messages in a conversation as read"""
+    if request.method == 'POST':
+        conversation = get_object_or_404(
+            Conversation.objects.filter(
+                participants=request.user,
+                id=conversation_id
+            )
+        )
+        
+        # Mark all unread messages from other user as read
+        conversation.messages.filter(
+            ~Q(sender=request.user),
+            is_read=False
+        ).update(is_read=True)
+        
+        return JsonResponse({'status': 'success'})
+    
+    return JsonResponse({'status': 'error'})

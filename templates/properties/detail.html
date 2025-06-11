@@ -256,6 +256,10 @@
                                 <i class="icon-message"></i>
                                 Contact Agent
                             </button>
+                            <button class="btn btn-success btn-block" onclick="openMessageModal()">
+                                <i class="icon-message"></i>
+                                Message Agent
+                            </button>
                             <a href="{{ property.agent.get_absolute_url }}" class="btn btn-outline btn-block">
                                 View Profile
                             </a>
@@ -388,6 +392,37 @@
         </div>
     </div>
 </div>
+
+<!-- Message Agent Modal -->
+<div id="message-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Message Agent</h3>
+            <button class="modal-close" onclick="closeMessageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="message-agent-form"
+                  hx-post="{% url 'messaging:start_conversation' %}"
+                  hx-target="#message-modal .modal-body"
+                  hx-swap="innerHTML"
+                  hx-indicator="#message-agent-indicator">
+                {% csrf_token %}
+                <input type="hidden" name="recipient_id" value="{{ property.agent.id }}">
+                <input type="hidden" name="property_id" value="{{ property.id }}">
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea name="message" id="message" class="form-control" rows="4" required placeholder="Type your message to the agent..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeMessageModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                    <span id="message-agent-indicator" class="htmx-indicator" style="display:none;">Sending...</span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_css %}
@@ -436,5 +471,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     calculateMortgage();
 });
+
+function openMessageModal() {
+    document.getElementById('message-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeMessageModal() {
+    document.getElementById('message-modal').style.display = 'none';
+    document.body.style.overflow = '';
+}
 </script>
 {% endblock %}
