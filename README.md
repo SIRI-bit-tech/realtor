@@ -22,6 +22,7 @@
 - [🛡️ Security Features](#️-security-features)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
+- [🚀 Deploying to Render](#-deploying-to-render)
 
 ## 🌟 Overview
 
@@ -378,3 +379,42 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 *For questions, support, or collaboration opportunities, please contact us at [siritech001@gmail.com](mailto:siritech001@gmail.com).*
 
 &copy; 2024 Nuvana Realty. All rights reserved.
+
+## 🚀 Deploying to Render
+
+1. **Set Environment Variables in Render Dashboard:**
+   - `DJANGO_SECRET_KEY`
+   - `DEBUG=False`
+   - `ALLOWED_HOSTS=.onrender.com`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+   - `POSTGRES_DB`
+   - `POSTGRES_USER`
+   - `POSTGRES_PASSWORD`
+   - `POSTGRES_HOST`
+   - `POSTGRES_PORT`
+
+2. **Build Command:**
+   ```sh
+   pip install -r requirements.txt
+   python manage.py collectstatic --noinput
+   python manage.py migrate
+   ```
+
+3. **Start Command:**
+   ```sh
+   gunicorn realtor_project.wsgi:application --bind 0.0.0.0:10000
+   ```
+
+4. **Static & Media Files:**
+   - Static files are served by Whitenoise.
+   - Media files are served from Cloudinary.
+
+5. **Database:**
+   - Use Render's PostgreSQL add-on or your own Postgres instance.
+
+6. **Cloudinary:**
+   - All media uploads go to Cloudinary automatically.
+
+---

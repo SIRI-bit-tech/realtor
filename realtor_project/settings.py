@@ -30,7 +30,7 @@ DEBUG = env('DEBUG')
 # Determine if we're in production
 IS_PRODUCTION = not DEBUG
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'] if DEBUG else [])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.onrender.com'])
 
 # Application definition
 DJANGO_APPS = [

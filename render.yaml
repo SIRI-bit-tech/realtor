@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: realtor-django
+    runtime: python
+    buildCommand: ./build.sh
+    startCommand: ./start.sh
+    plan: free
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: 'False'
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: POSTGRES_DB
+        fromDatabase:
+            name: realtor-db
+            property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+            name: realtor-db
+            property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+            name: realtor-db
+            property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+            name: realtor-db
+            property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+            name: realtor-db
+            property: port
+    autoDeploy: true
+    healthCheckPath: /
+
+databases:
+  - name: realtor-db
+    plan: free
+    postgresMajorVersion: "15" 
