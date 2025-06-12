@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import environ
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,6 +17,7 @@ env = environ.Env(
     EMAIL_HOST_PASSWORD=(str, 'your_app_password'),
     DEFAULT_FROM_EMAIL=(str, 'siricoding1@gmail.com'),
     CONTACT_EMAIL=(str, 'siritech@icloud.com'),
+    DATABASE_URL=(str, None),
 )
 
 # Take environment variables from .env file
@@ -106,24 +108,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'realtor_project.wsgi.application'
 
 # Database
-if DEBUG:
-    # SQLite for development
+DATABASE_URL = env('DATABASE_URL', default=None)
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    }
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
-    # PostgreSQL for production
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('POSTGRES_DB'),
-            'USER': env('POSTGRES_USER'),
-            'PASSWORD': env('POSTGRES_PASSWORD'),
-            'HOST': env('POSTGRES_HOST'),
-            'PORT': env('POSTGRES_PORT'),
         }
     }
 
