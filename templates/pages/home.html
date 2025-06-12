@@ -216,7 +216,7 @@
                                 {% endif %}
                             </div>
                             <div class="agent-info">
-                                <div class="agent-name">{{ property.agent.get_full_name }}</div>
+                                <div class="agent-name">{% if property.agent.is_verified %}<img src="{% static 'images/verified-badge.svg' %}" alt="Verified" class="verified-badge-icon" title="Verified" /> {% endif %}{{ property.agent.get_full_name }}</div>
                                 <div class="agent-title">Real Estate Agent</div>
                             </div>
                         </div>

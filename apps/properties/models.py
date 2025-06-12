@@ -150,3 +150,19 @@ class PropertyView(models.Model):
         indexes = [
             models.Index(fields=['property', '-created_at']),
         ]
+
+class PropertyReview(models.Model):
+    RATING_CHOICES = [(i, i) for i in range(1, 6)]
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='reviews')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField(choices=RATING_CHOICES)
+    title = models.CharField(max_length=100)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['property', 'reviewer']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Review for {self.property.title} by {self.reviewer.username}"

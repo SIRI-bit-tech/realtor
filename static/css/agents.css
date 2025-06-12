@@ -834,3 +834,18 @@
     gap: 10px;
   }
 }
+
+.verified-badge {
+  color: var(--accent-color);
+  font-size: 1.1em;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.verified-badge-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 6px;
+  display: inline-block;
+}
