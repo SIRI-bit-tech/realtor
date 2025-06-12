@@ -127,6 +127,7 @@ function initPropertyMap() {
           highlightPropertyCard(property.id)
         })
       })
+      initDrawControls(map, data.markers)
     })
     .catch((error) => console.error("Error loading map data:", error))
 }
@@ -521,4 +522,84 @@ function initViewToggle() {
       }
     });
   });
+}
+
+// Draw-on-map search functionality
+let drawnPolygon = null;
+let drawnLayer = null;
+let drawControl = null;
+
+function enableDrawOnMap(map, onPolygonDrawn) {
+  if (!window.L || !map) return;
+  if (!window.L.Control.Draw) return;
+
+  if (drawControl) {
+    map.removeControl(drawControl);
+  }
+
+  drawControl = new L.Control.Draw({
+    draw: {
+      polygon: true,
+      polyline: false,
+      rectangle: false,
+      circle: false,
+      marker: false,
+      circlemarker: false
+    },
+    edit: {
+      featureGroup: drawnLayer || new L.FeatureGroup()
+    }
+  });
+  map.addControl(drawControl);
+
+  if (!drawnLayer) {
+    drawnLayer = new L.FeatureGroup();
+    map.addLayer(drawnLayer);
+  }
+
+  map.on(L.Draw.Event.CREATED, function (e) {
+    if (drawnPolygon) {
+      drawnLayer.removeLayer(drawnPolygon);
+    }
+    drawnPolygon = e.layer;
+    drawnLayer.addLayer(drawnPolygon);
+    if (onPolygonDrawn) {
+      onPolygonDrawn(drawnPolygon.getLatLngs());
+    }
+    document.getElementById('clear-draw-btn').style.display = 'inline-block';
+  });
+
+  document.getElementById('clear-draw-btn').onclick = function () {
+    if (drawnPolygon) {
+      drawnLayer.removeLayer(drawnPolygon);
+      drawnPolygon = null;
+      if (onPolygonDrawn) {
+        onPolygonDrawn(null);
+      }
+    }
+    this.style.display = 'none';
+  };
+}
+
+// Integrate with map view toggle
+function initDrawControls(map, properties) {
+  const drawControls = document.getElementById('draw-controls');
+  const drawBtn = document.getElementById('draw-area-btn');
+  if (!drawControls || !drawBtn) return;
+  drawControls.style.display = 'block';
+  drawBtn.onclick = function () {
+    enableDrawOnMap(map, function (polygonLatLngs) {
+      if (!polygonLatLngs) {
+        // Show all properties
+        updateMapMarkers(map, properties);
+        return;
+      }
+      // Filter properties within polygon
+      const filtered = properties.filter((prop) => {
+        if (!prop.lat || !prop.lng) return false;
+        return window.L.polygon(polygonLatLngs).getBounds().contains([prop.lat, prop.lng]);
+      });
+      updateMapMarkers(map, filtered);
+    });
+  };
 }

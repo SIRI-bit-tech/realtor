@@ -54,3 +54,41 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+
+class SavedSearch(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_searches')
+    name = models.CharField(max_length=100, blank=True)
+    criteria = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    alert_enabled = models.BooleanField(default=True)
+    last_alert_sent = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name or 'Saved Search'}"
+
+    def get_absolute_url(self):
+        return reverse('users:saved_search_detail', kwargs={'pk': self.pk})
+
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ("info", "Info"),
+        ("success", "Success"),
+        ("warning", "Warning"),
+        ("error", "Error"),
+        ("alert", "Alert"),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    message = models.CharField(max_length=255)
+    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default="info")
+    is_read = models.BooleanField(default=False)
+    link = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username}: {self.message[:40]}"

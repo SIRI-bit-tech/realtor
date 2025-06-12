@@ -2,6 +2,13 @@
 {% load static %}
 
 {% block title %}{{ agent.user.get_full_name }} - Real Estate Agent | Nuvana Realty{% endblock %}
+{% block og_title %}{{ agent.user.get_full_name }} - Real Estate Agent | Nuvana Realty{% endblock %}
+{% block og_description %}{{ agent.user.bio|truncatewords:30 }}{% endblock %}
+{% block og_image %}{% if agent.user.avatar %}{{ agent.user.avatar.url }}{% else %}{% static 'images/og-image.jpg' %}{% endif %}{% endblock %}
+{% block twitter_card %}summary_large_image{% endblock %}
+{% block twitter_title %}{{ agent.user.get_full_name }} - Real Estate Agent | Nuvana Realty{% endblock %}
+{% block twitter_description %}{{ agent.user.bio|truncatewords:30 }}{% endblock %}
+{% block twitter_image %}{% if agent.user.avatar %}{{ agent.user.avatar.url }}{% else %}{% static 'images/og-image.jpg' %}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="agent-detail-page">
@@ -218,4 +225,3 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/agents.css' %}">
 {% endblock %}
-

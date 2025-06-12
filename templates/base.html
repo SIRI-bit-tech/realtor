@@ -58,7 +58,7 @@
         <div class="container">
             <div class="nav-brand">
                 <a href="{% url 'core:home' %}" class="brand-link">
-                    <img src="{% static 'images/logo.svg' %}" alt="Nuvana Realty" class="brand-logo">
+                    <img src="{% static 'images/logo.svg' %}" alt="" class="brand-logo">
                     <span class="brand-text">Nuvana Realty</span>
                 </a>
             </div>
@@ -74,12 +74,12 @@
                     <li class="nav-item">
                         <a href="{% url 'agents:list' %}" class="nav-link {% if 'agents' in request.resolver_match.namespace %}active{% endif %}">Agents</a>
                     </li>
-                    <li class="nav-item">
+                    {% comment %} <li class="nav-item">
                         <a href="{% url 'core:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
-                    </li>
-                    <li class="nav-item">
+                    </li> {% endcomment %}
+                    {% comment %} <li class="nav-item">
                         <a href="{% url 'core:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
-                    </li>
+                    </li> {% endcomment %}
                     <li class="nav-item">
                         <a href="{% url 'analytics:dashboard' %}" class="nav-link {% if 'analytics' in request.resolver_match.namespace %}active{% endif %}">Analytics</a>
                     </li>
@@ -88,6 +88,16 @@
             
             <div class="nav-actions">
                 {% if user.is_authenticated %}
+                    <div class="notification-bell" id="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-badge" style="display:none;">0</span>
+                        <div class="notification-dropdown" id="notification-dropdown">
+                            <div class="notification-header">Notifications</div>
+                            <ul class="notification-list" id="notification-list">
+                                <li class="notification-empty">No notifications</li>
+                            </ul>
+                        </div>
+                    </div>
                     <div class="user-menu">
                         <button class="user-menu-toggle" id="user-menu-toggle">
                             {% if user.avatar %}
@@ -95,7 +105,6 @@
                             {% else %}
                                 <div class="user-avatar-placeholder">{{ user.username|first|upper }}</div>
                             {% endif %}
-                            <span>{{ user.get_full_name|default:user.username }}</span>
                         </button>
                         <div class="user-dropdown" id="user-dropdown">
                             <a href="{% url 'users:profile' user.username %}" class="dropdown-item">Profile</a>

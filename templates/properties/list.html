@@ -126,6 +126,16 @@
                 {% include 'partials/property_list.html' %}
             </div>
 
+            <!-- Draw Controls -->
+            <div class="draw-controls" style="display:none;" id="draw-controls">
+                <button class="btn btn-secondary" id="draw-area-btn" type="button">
+                    <i class="fas fa-pencil-ruler"></i> Draw Area
+                </button>
+                <button class="btn btn-outline" id="clear-draw-btn" type="button" style="display:none;">
+                    <i class="fas fa-times"></i> Clear Area
+                </button>
+            </div>
+
             <!-- Map View -->
             <div class="map-container" id="map-container" style="display: none;">
                 <div id="property-map" style="height: 600px;"></div>

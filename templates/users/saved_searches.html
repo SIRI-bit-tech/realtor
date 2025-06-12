@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Saved Searches | Nuvana Realty{% endblock %}
+
+{% block content %}
+<div class="saved-searches-page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Saved Searches</h1>
+            <a href="/search/" class="btn btn-primary">New Search</a>
+        </div>
+        <div class="saved-searches-list">
+            {% if saved_searches %}
+                <ul class="search-list">
+                    {% for search in saved_searches %}
+                        <li class="search-item" id="search-{{ forloop.counter0 }}">
+                            <div class="search-info">
+                                <span class="search-name">{{ search.name|default:"Untitled" }}</span>
+                                <span class="search-date">Saved {{ search.created_at|date:"M d, Y H:i" }}</span>
+                            </div>
+                            <div class="search-actions">
+                                {% if search.is_legacy %}
+                                <form method="post" action="{% url 'users:delete_saved_search' search.index %}" hx-post="{% url 'users:delete_saved_search' search.index %}" hx-target="#search-{{ forloop.counter0 }}" hx-swap="outerHTML" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                {% else %}
+                                <form method="post" action="{% url 'users:delete_saved_search_model' search.id %}" hx-post="{% url 'users:delete_saved_search_model' search.id %}" hx-target="#search-{{ forloop.counter0 }}" hx-swap="outerHTML" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                {% endif %}
+                                <form method="get" action="/search/" style="display:inline;">
+                                    {% for key, value in search.params.items %}
+                                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-secondary btn-sm">Run</button>
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-bookmark"></i>
+                    <h3>No Saved Searches</h3>
+                    <p>Save your favorite search criteria to get alerts for new matches.</p>
+                    <a href="/search/" class="btn btn-primary">Start a Search</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.saved-searches-page {
+    padding: 2rem 0;
+    background: var(--secondary-color);
+    min-height: 80vh;
+}
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.saved-searches-list {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+}
+.search-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.search-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--neutral-color);
+    padding: 1rem 0;
+}
+.search-item:last-child {
+    border-bottom: none;
+}
+.search-info {
+    display: flex;
+    flex-direction: column;
+}
+.search-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+.search-date {
+    font-size: 0.9rem;
+    color: var(--neutral-color);
+}
+.search-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+@media (max-width: 600px) {
+    .saved-searches-list {
+        padding: 1rem;
+    }
+    .search-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .page-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+{% endblock %} 
+ 

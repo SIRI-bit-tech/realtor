@@ -8,14 +8,14 @@
 {% block content %}
 <style>
 :root {
-  --chat-bg: #f0f2f5;
+  --chat-bg: var(--secondary-color);
   --chat-header-bg: #fff;
-  --chat-bubble-sent: #2979ff;
+  --chat-bubble-sent: var(--primary-color);
   --chat-bubble-received: #fff;
-  --chat-bubble-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  --chat-bubble-shadow: var(--shadow-md);
   --chat-bubble-radius: 18px;
   --chat-input-bg: #fff;
-  --chat-input-border: #d0d7de;
+  --chat-input-border: #e5e7eb;
 }
 html, body {
   height: 100vh;
@@ -71,14 +71,14 @@ body {
   align-items: center;
   gap: 14px;
   padding: 16px 18px 12px 18px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--chat-input-border);
   position: sticky;
   top: 0;
   z-index: 1000;
   min-height: 60px;
 }
 .chat-app-header .back-btn {
-  color: #1a3c4c;
+  color: var(--primary-color);
   font-size: 1.3em;
   margin-right: 2px;
   display: flex;
@@ -89,7 +89,7 @@ body {
 }
 .chat-app-header .user-avatar img, .chat-app-header .avatar-placeholder {
   width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
-  background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555; font-size: 1.1em;
+  background: var(--secondary-color); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-color); font-size: 1.1em;
 }
 .chat-app-header .user-details {
   flex: 1;
@@ -99,7 +99,7 @@ body {
   font-size: 1.08em;
   margin: 0 0 2px 0;
   font-weight: 700;
-  color: #1a3c4c;
+  color: var(--primary-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -110,7 +110,7 @@ body {
 }
 .chat-app-header .property-context {
   font-size: 0.93em;
-  color: #888;
+  color: var(--accent-color);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -129,7 +129,7 @@ body {
 .chat-app-input {
   background: var(--chat-input-bg);
   padding: 10px 8px 10px 8px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--chat-input-border);
   position: absolute;
   left: 0;
   right: 0;
@@ -155,7 +155,7 @@ body {
   min-height: 38px;
   max-height: 90px;
   resize: none;
-  background: #f7f9fa;
+  background: var(--secondary-color);
   margin: 0;
   box-sizing: border-box;
 }
@@ -164,18 +164,18 @@ body {
   height: 38px;
   border-radius: 12px;
   font-size: 1.2em;
-  background: #2979ff;
+  background: var(--primary-color);
   color: #fff;
   border: none;
   font-weight: 600;
-  box-shadow: 0 1px 4px rgba(41,121,255,0.08);
+  box-shadow: var(--shadow-md);
   transition: background 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .chat-app-input button:active {
-  background: #1565c0;
+  background: var(--accent-color);
 }
 </style>
 <div class="chat-app-root">

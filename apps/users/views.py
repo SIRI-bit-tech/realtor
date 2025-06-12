@@ -7,8 +7,9 @@ from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from apps.properties.models import Property, PropertyFavorite
-from .models import UserProfile
+from .models import UserProfile, SavedSearch
 from apps.messaging.models import Conversation, Message
+from django.http import HttpResponse, JsonResponse
 
 User = get_user_model()
 
@@ -190,49 +191,58 @@ def favorites(request):
 
 @login_required
 def saved_searches(request):
-    """User's saved searches"""
+    """User's saved searches (supports both legacy JSONField and new SavedSearch model)"""
     try:
         profile = request.user.profile
-        saved_searches = profile.saved_searches or []
+        legacy_searches = profile.saved_searches or []
     except UserProfile.DoesNotExist:
-        # Create profile if it doesn't exist
         profile = UserProfile.objects.create(user=request.user)
-        saved_searches = []
-    
+        legacy_searches = []
+    # Get new SavedSearch model entries
+    model_searches = list(request.user.saved_searches.all())
+    # Combine both for display
+    saved_searches = [
+        {'name': s.get('name', 'Untitled'), 'params': s.get('params', {}), 'created_at': s.get('created_at', None), 'is_legacy': True, 'index': i}
+        for i, s in enumerate(legacy_searches)
+    ] + [
+        {'name': s.name, 'params': s.criteria, 'created_at': s.created_at, 'is_legacy': False, 'id': s.id}
+        for s in model_searches
+    ]
     context = {
         'saved_searches': saved_searches,
     }
-    
     return render(request, 'users/saved_searches.html', context)
 
 @login_required
 @require_http_methods(["POST"])
 def save_search(request):
-    """Save current search parameters"""
+    """Save current search parameters to both legacy JSONField and new SavedSearch model, and trigger notification."""
     try:
         profile = request.user.profile
     except UserProfile.DoesNotExist:
         profile = UserProfile.objects.create(user=request.user)
-    
     search_params = {
         'name': request.POST.get('search_name', 'Untitled Search'),
         'params': dict(request.POST),
         'created_at': timezone.now().isoformat(),
     }
-    
+    # Save to legacy JSONField
     if not profile.saved_searches:
         profile.saved_searches = []
-    
     profile.saved_searches.append(search_params)
     profile.save()
-    
+    # Save to new SavedSearch model
+    SavedSearch.objects.create(
+        user=request.user,
+        name=search_params['name'],
+        criteria=search_params['params'],
+        alert_enabled=True
+    )
     messages.success(request, 'Search saved successfully!')
-    
     if request.htmx:
         return render(request, 'partials/search_saved.html', {
             'search': search_params
         })
-    
     return redirect('users:saved_searches')
 
 @login_required
@@ -252,6 +262,20 @@ def delete_saved_search(request, search_index):
     if request.htmx:
         return render(request, 'partials/search_deleted.html')
     
+    return redirect('users:saved_searches')
+
+@login_required
+@require_http_methods(["POST"])
+def delete_saved_search_model(request, pk):
+    """Delete a SavedSearch model entry by ID (non-legacy)."""
+    try:
+        search = SavedSearch.objects.get(pk=pk, user=request.user)
+        search.delete()
+        messages.success(request, 'Saved search deleted!')
+    except SavedSearch.DoesNotExist:
+        pass
+    if request.htmx:
+        return HttpResponse("")
     return redirect('users:saved_searches')
 
 def public_profile(request, username):
@@ -278,3 +302,20 @@ def public_profile(request, username):
         return render(request, 'users/public_agent_profile.html', context)
     
     return render(request, 'users/public_profile.html', context)
+
+@login_required
+def notifications_api(request):
+    """Return the latest notifications for the logged-in user as JSON."""
+    notifications = request.user.notifications.order_by('-created_at')[:20]
+    data = [
+        {
+            'id': n.id,
+            'message': n.message,
+            'type': n.type,
+            'is_read': n.is_read,
+            'link': n.link,
+            'created_at': n.created_at.isoformat(),
+        }
+        for n in notifications
+    ]
+    return JsonResponse({'notifications': data})

@@ -4,11 +4,11 @@
         {% if message.sender.avatar %}
                 <img src="{{ message.sender.avatar.url }}" alt="{{ message.sender.get_full_name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
         {% else %}
-                <div class="avatar-placeholder" style="width: 36px; height: 36px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555;">{{ message.sender.first_name|first }}{{ message.sender.last_name|first }}</div>
+                <div class="avatar-placeholder" style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">{{ message.sender.first_name|first }}{{ message.sender.last_name|first }}</div>
         {% endif %}
     </div>
     {% endif %}
-    <div class="message-bubble" style="max-width: 60vw; padding: 14px 22px; border-radius: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); {% if message.sender == request.user %}background: #2979ff; color: #fff; margin-left: 40px; text-align: right;{% else %}background: #f1f3f6; color: #222; margin-right: 40px; text-align: left;{% endif %}">
+    <div class="message-bubble" style="max-width: 60vw; padding: 14px 22px; border-radius: 18px; box-shadow: var(--shadow-md); {% if message.sender == request.user %}background: var(--primary-color); color: #fff; margin-left: 40px; text-align: right;{% else %}background: var(--secondary-color); color: var(--neutral-color); margin-right: 40px; text-align: left;{% endif %}">
         <div class="message-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
             <span class="message-sender" style="font-weight: 600; font-size: 0.95em;">{{ message.sender.get_full_name }}</span>
             <span class="message-time" style="font-size: 0.8em; color: #cfd8dc; margin-left: 10px;">{{ message.timestamp|date:"M d, Y g:i A" }}</span>
@@ -22,7 +22,7 @@
             {% if message.sender.avatar %}
                 <img src="{{ message.sender.avatar.url }}" alt="{{ message.sender.get_full_name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
             {% else %}
-                <div class="avatar-placeholder" style="width: 36px; height: 36px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #555;">{{ message.sender.first_name|first }}{{ message.sender.last_name|first }}</div>
+                <div class="avatar-placeholder" style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-color); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">{{ message.sender.first_name|first }}{{ message.sender.last_name|first }}</div>
             {% endif %}
         </div>
     {% endif %}

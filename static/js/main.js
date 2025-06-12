@@ -9,6 +9,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // HTMX configuration
   configureHTMX()
+
+  // Notification Bell Dropdown Logic
+  const bell = document.getElementById("notification-bell");
+  const dropdown = document.getElementById("notification-dropdown");
+  const badge = document.getElementById("notification-badge");
+  if (bell && dropdown) {
+    bell.addEventListener("click", (e) => {
+      e.stopPropagation();
+      bell.classList.toggle("open");
+      dropdown.classList.toggle("show");
+    });
+    document.addEventListener("click", (e) => {
+      if (!bell.contains(e.target)) {
+        bell.classList.remove("open");
+        dropdown.classList.remove("show");
+      }
+    });
+  }
+  // Example: Update badge count (replace with real data)
+  function updateNotificationBadge(count) {
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = "flex";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+  }
+  // updateNotificationBadge(3); // Example usage
+
+  // Notification fetching logic
+  async function fetchNotifications() {
+    try {
+      const response = await fetch('/users/notifications/api/');
+      if (!response.ok) return;
+      const data = await response.json();
+      const notifications = data.notifications || [];
+      const list = document.getElementById('notification-list');
+      const badge = document.getElementById('notification-badge');
+      if (list) {
+        list.innerHTML = '';
+        if (notifications.length === 0) {
+          list.innerHTML = '<li class="notification-empty">No notifications</li>';
+        } else {
+          notifications.forEach(n => {
+            const li = document.createElement('li');
+            li.className = 'notification-item notification-' + n.type + (n.is_read ? '' : ' unread');
+            li.innerHTML = n.link ? `<a href="${n.link}">${n.message}</a>` : n.message;
+            list.appendChild(li);
+          });
+        }
+      }
+      if (badge) {
+        const unread = notifications.filter(n => !n.is_read).length;
+        badge.textContent = unread;
+        badge.style.display = unread > 0 ? 'flex' : 'none';
+      }
+    } catch (e) { /* ignore */ }
+  }
+  // Fetch notifications when bell is opened
+  if (bell) {
+    bell.addEventListener('click', fetchNotifications);
+  }
+  // Poll for notifications every 30 seconds
+  setInterval(fetchNotifications, 30000);
+  // Initial fetch
+  fetchNotifications();
 })
 
 // Navigation functionality
