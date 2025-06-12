@@ -18,6 +18,13 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: realtor-redis
+          property: connectionString
       - key: POSTGRES_DB
         fromDatabase:
             name: realtor-db
@@ -40,6 +47,11 @@ services:
             property: port
     autoDeploy: true
     healthCheckPath: /
+  - type: redis
+    name: realtor-redis
+    plan: free
+    ipAllowList:
+      - source: 0.0.0.0/0
 
 databases:
   - name: realtor-db
