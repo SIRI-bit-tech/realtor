@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Privacy Policy{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/privacy.css' %}">{% endblock %}
+{% block content %}
+<div class="privacy-policy-container">
+  <h1>Privacy Policy</h1>
+  <p>This Privacy Policy explains how we collect, use, and protect your information. (Insert your real policy here.)</p>
+  <h2>Information We Collect</h2>
+  <ul>
+    <li>Account and profile information</li>
+    <li>Property and messaging data</li>
+    <li>Usage and analytics data</li>
+  </ul>
+  <h2>Your Rights</h2>
+  <ul>
+    <li>Access, correct, or delete your data</li>
+    <li>Request data export</li>
+    <li>Withdraw consent</li>
+  </ul>
+  <h2>Contact</h2>
+  <p>For privacy questions, contact us at <a href="mailto:privacy@nuvanarealty.com">privacy@nuvanarealty.com</a>.</p>
+</div>
+{% endblock %} 

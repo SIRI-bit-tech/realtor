@@ -115,8 +115,10 @@
                         </div>
                     </div>
                 {% else %}
-                    <a href="{% url 'accounts:login' %}" class="btn btn-outline">Login</a>
-                    <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Sign Up</a>
+                    <div class="nav-auth-group">
+                        <a href="{% url 'accounts:login' %}" class="btn btn-accent btn-sm nav-auth-btn">Login</a>
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-accent btn-sm nav-auth-btn">Sign Up</a>
+                    </div>
                 {% endif %}
             </div>
             
@@ -234,5 +236,7 @@
       display: none !important;
     }
     </style>
+
+    {% include 'partials/cookie_consent.html' %}
 </body>
 </html>

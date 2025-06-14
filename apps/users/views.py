@@ -10,6 +10,8 @@ from apps.properties.models import Property, PropertyFavorite
 from .models import UserProfile, SavedSearch
 from apps.messaging.models import Conversation, Message
 from django.http import HttpResponse, JsonResponse
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 User = get_user_model()
 
@@ -319,3 +321,35 @@ def notifications_api(request):
         for n in notifications
     ]
     return JsonResponse({'notifications': data})
+
+@login_required
+def data_export(request):
+    user = request.user
+    profile = getattr(user, 'profile', None)
+    favorites = list(user.propertyfavorite_set.values('property__id', 'property__title', 'property__address'))
+    saved_searches = []
+    if profile and hasattr(profile, 'saved_searches'):
+        saved_searches = profile.saved_searches if isinstance(profile.saved_searches, list) else []
+    data = {
+        'user': {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        },
+        'profile': {
+            'bio': getattr(profile, 'bio', ''),
+            'phone': getattr(profile, 'phone', ''),
+            'location': getattr(profile, 'location', ''),
+            'website': getattr(profile, 'website', ''),
+            'preferred_contact': getattr(profile, 'preferred_contact', ''),
+            'budget_min': getattr(profile, 'budget_min', None),
+            'budget_max': getattr(profile, 'budget_max', None),
+            'preferred_locations': getattr(profile, 'preferred_locations', []),
+        } if profile else {},
+        'favorites': favorites,
+        'saved_searches': saved_searches,
+    }
+    response = HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="user_data.json"'
+    return response

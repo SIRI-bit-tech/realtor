@@ -130,3 +130,7 @@ def search_suggestions(request):
 
     return JsonResponse(suggestions)
 
+
+def privacy_policy(request):
+    return render(request, 'pages/privacy.html')
+

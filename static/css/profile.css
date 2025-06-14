@@ -295,4 +295,21 @@
   .property-card img {
     height: 90px;
   }
+}
+
+.profile-data-export {
+  text-align: right;
+}
+.profile-data-export .btn-outline {
+  border: 1.5px solid #2979ff;
+  color: #2979ff;
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 1em;
+  transition: background 0.2s, color 0.2s;
+}
+.profile-data-export .btn-outline:hover {
+  background: #2979ff;
+  color: #fff;
 } 

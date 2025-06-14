@@ -14,4 +14,5 @@ urlpatterns = [
     path('notifications/api/', views.notifications_api, name='notifications_api'),
     path('<str:username>/', views.profile, name='profile'),
     path('public/<str:username>/', views.public_profile, name='public_profile'),
+    path('data-export/', views.data_export, name='data_export'),
 ]

@@ -96,6 +96,11 @@
       <a href="{% url 'messaging:conversation_list' %}" class="profile-link">Go to Inbox</a>
     </div>
     {% endif %}
+    {% if is_own_profile %}
+      <div class="profile-data-export" style="margin: 24px 0;">
+        <a href="{% url 'users:data_export' %}" class="btn btn-outline" download>Download My Data (GDPR/CCPA)</a>
+      </div>
+    {% endif %}
   </section>
 </div>
 {% endblock %}

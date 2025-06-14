@@ -777,26 +777,12 @@
   text-align: center;
   color: white;
   overflow: hidden;
+  background: #18413a !important; /* Dark teal for strong contrast */
 }
 
-.cta-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("/static/images/cta-bg.jpg") center / cover;
-  z-index: -1;
-}
-
+.cta-background,
 .cta-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--primary-gradient);
-  opacity: 0.9;
+  display: none !important;
 }
 
 .cta-content {
@@ -809,7 +795,8 @@
 .cta-title {
   font-size: 2.5rem;
   margin-bottom: var(--spacing-lg);
-  color: white;
+  color: #fff !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .cta-subtitle {
@@ -817,6 +804,7 @@
   margin-bottom: var(--spacing-2xl);
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .cta-actions {
