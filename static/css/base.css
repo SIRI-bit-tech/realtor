@@ -915,8 +915,9 @@ a:hover {
 }
 
 .notification-item.unread {
-  background: var(--accent-color);
-  color: white;
+  background: #eaf6f6;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .notification-empty {
@@ -999,5 +1000,14 @@ body.with-cookie-banner .main-content {
 @media (max-width: 767px) {
   .mobile-only {
     display: flex !important;
+  }
+}
+
+.desktop-only {
+  display: flex !important;
+}
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none !important;
   }
 }

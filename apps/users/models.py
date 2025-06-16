@@ -86,9 +86,25 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    broadcast = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_notifications")
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.user.username}: {self.message[:40]}"
+        return f"{self.user.username if self.user else 'Broadcast'}: {self.message[:40]}"
+
+
+class BroadcastRead(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="read_broadcasts")
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name="read_by")
+    read_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "notification")
+        verbose_name = "Broadcast Read Receipt"
+        verbose_name_plural = "Broadcast Read Receipts"
+
+    def __str__(self):
+        return f"{self.user.username} read {self.notification.id}"

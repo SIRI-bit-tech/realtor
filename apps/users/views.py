@@ -4,10 +4,10 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.utils import timezone
 from apps.properties.models import Property, PropertyFavorite
-from .models import UserProfile, SavedSearch
+from .models import UserProfile, SavedSearch, Notification, BroadcastRead
 from apps.messaging.models import Conversation, Message
 from django.http import HttpResponse, JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
@@ -307,18 +307,28 @@ def public_profile(request, username):
 
 @login_required
 def notifications_api(request):
-    """Return the latest notifications for the logged-in user as JSON."""
-    notifications = request.user.notifications.order_by('-created_at')[:20]
+    """Return only unread notifications for the logged-in user as JSON, including unread broadcasts."""
+    notifications = list(request.user.notifications.filter(is_read=False).order_by('-created_at'))
+    # More robust unread broadcasts logic
+    read_broadcast_ids = BroadcastRead.objects.filter(user=request.user).values_list('notification_id', flat=True)
+    unread_broadcasts = Notification.objects.filter(
+        broadcast=True
+    ).exclude(
+        id__in=read_broadcast_ids
+    ).order_by('-created_at')
+    all_notifications = notifications + list(unread_broadcasts)
+    all_notifications = sorted(all_notifications, key=lambda n: n.created_at, reverse=True)[:20]
     data = [
         {
             'id': n.id,
             'message': n.message,
             'type': n.type,
-            'is_read': n.is_read,
+            'is_read': n.is_read if not n.broadcast else False,
             'link': n.link,
             'created_at': n.created_at.isoformat(),
+            'broadcast': getattr(n, 'broadcast', False),
         }
-        for n in notifications
+        for n in all_notifications
     ]
     return JsonResponse({'notifications': data})
 
@@ -353,3 +363,13 @@ def data_export(request):
     response = HttpResponse(json.dumps(data, cls=DjangoJSONEncoder), content_type='application/json')
     response['Content-Disposition'] = 'attachment; filename="user_data.json"'
     return response
+
+@login_required
+@require_POST
+def mark_broadcast_read(request, notification_id):
+    from .models import Notification, BroadcastRead
+    notification = Notification.objects.filter(id=notification_id, broadcast=True).first()
+    if notification:
+        BroadcastRead.objects.get_or_create(user=request.user, notification=notification)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Notification not found'}, status=404)

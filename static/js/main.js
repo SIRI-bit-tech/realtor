@@ -57,8 +57,41 @@ document.addEventListener("DOMContentLoaded", () => {
           notifications.forEach(n => {
             const li = document.createElement('li');
             li.className = 'notification-item notification-' + n.type + (n.is_read ? '' : ' unread');
-            li.innerHTML = n.link ? `<a href="${n.link}">${n.message}</a>` : n.message;
+            if (n.broadcast) {
+              li.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                  <span>${n.link ? `<a href="${n.link}">${n.message}</a>` : n.message}</span>
+                  <button class="btn btn-sm btn-outline mark-broadcast-read" data-id="${n.id}" style="margin-left:10px;">Mark as read</button>
+                </div>
+              `;
+            } else {
+              li.innerHTML = n.link ? `<a href="${n.link}">${n.message}</a>` : n.message;
+            }
             list.appendChild(li);
+          });
+          // Add event listeners for mark as read
+          list.querySelectorAll('.mark-broadcast-read').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+              e.preventDefault();
+              const id = btn.getAttribute('data-id');
+              const li = btn.closest('li');
+              try {
+                const resp = await fetch(`/users/notifications/mark_broadcast_read/${id}/`, {method: 'POST', headers: {'X-CSRFToken': getCSRFToken()}});
+                const data = await resp.json();
+                if (data.status === 'success') {
+                  if (li) li.remove();
+                  // Update badge immediately
+                  const badge = document.getElementById('notification-badge');
+                  let count = parseInt(badge.textContent, 10) || 1;
+                  badge.textContent = Math.max(count - 1, 0);
+                  if (badge.textContent === '0') badge.style.display = 'none';
+                } else {
+                  showNotification('Failed to mark as read', 'error');
+                }
+              } catch (err) {
+                showNotification('Error marking as read', 'error');
+              }
+            });
           });
         }
       }
@@ -390,3 +423,19 @@ function throttle(func, limit) {
     }
   });
 })();
+
+// Utility to get CSRF token
+function getCSRFToken() {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, 10) === 'csrftoken=') {
+        cookieValue = decodeURIComponent(cookie.substring(10));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}

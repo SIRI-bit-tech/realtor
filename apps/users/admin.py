@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
-from .models import User, UserProfile
+from .models import User, UserProfile, Notification, BroadcastRead
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
@@ -87,3 +87,14 @@ class UserProfileAdmin(admin.ModelAdmin):
     def search_count(self, obj):
         return len(obj.saved_searches) if obj.saved_searches else 0
     search_count.short_description = 'Saved Searches'
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("user", "message", "type", "is_read", "broadcast", "created_by", "created_at")
+    list_filter = ("type", "is_read", "broadcast", "created_by")
+    search_fields = ("message", "user__username", "created_by__username")
+    fieldsets = (
+        (None, {"fields": ("user", "message", "type", "is_read", "link", "broadcast", "created_by")}),
+    )
+
+admin.site.register(Notification, NotificationAdmin)
+admin.site.register(BroadcastRead)
